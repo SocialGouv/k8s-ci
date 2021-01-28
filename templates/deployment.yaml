@@ -1,9 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: {{ include "webhook-receiver.fullname" . }}
   labels:
     {{- include "webhook-receiver.labels" . | nindent 4 }}
+    timestamp: {{ now | quote }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -38,7 +40,7 @@ spec:
           # SPECIFIC TO CI ENV FROM VALUES
           - name: PROJECT
             value: {{ required "project must be specified" .Values.project }}
-          - name: CONTEXT_LIST
+          - name: CI_CONTEXT_LIST
             value: "{{ .Values.contextList }}"
           - name: WEBHOOK_TOKEN
             valueFrom:

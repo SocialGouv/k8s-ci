@@ -31,35 +31,9 @@ spec:
           volumeMounts:
             - name: workspace
               mountPath: /workspace
-        {{ if ne (env.Getenv "WAIT_FOR_JOB") "" }}
-        - name: wait-for-build-job-complete
-          image: registry.gitlab.factory.social.gouv.fr/devthejo/docker-kubectl-helm:1.1.0
-          env:
-            - name: K8S_SERVER
-              value: {{.Env.K8S_SERVER}}
-            - name: K8S_NS
-              value: {{.Env.K8S_NS}}
-            - name: K8S_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: {{.Env.K8S_JOB_TOKEN_SECRET_NAME}}
-                  key: {{.Env.K8S_JOB_TOKEN_SECRET_KEY}}
-          command:
-            - /bin/sh
-            - -c
-            - |
-              kubectl \
-                --server=$K8S_SERVER \
-                --token=$K8S_TOKEN \
-                --namespace=$K8S_NS \
-                wait \
-                --for=condition=complete \
-                job/{{.Env.WAIT_FOR_JOB}} \
-                --timeout=60m
-        {{ end }}
       containers:
-        - name: kube-deploy
-          image: registry.gitlab.factory.social.gouv.fr/devthejo/docker-kubectl-helm:1.1.0
+        - name: k8s-deploy
+          image: registry.gitlab.factory.social.gouv.fr/devthejo/k8s-ci-deploy:1.0.0
           env:
             - name: K8S_SERVER
               value: {{.Env.K8S_DEPLOY_SERVER}}
@@ -80,10 +54,10 @@ spec:
               value: {{.Env.IMAGE_PATH}}
             - name: IMAGE_TAG
               value: {{.Env.IMAGE_TAG}}
-            - name: CONTEXT
-              value: {{.Env.CONTEXT}}
-            - name: PRODUCTION
-              value: {{.Env.PRODUCTION}}
+            - name: CI_CONTEXT
+              value: {{.Env.CI_CONTEXT}}
+            - name: CI_PRODUCTION
+              value: {{.Env.CI_PRODUCTION}}
             - name: REGISTRY_URL
               value: {{.Env.REGISTRY_URL}}
             - name: REGISTRY_USER_KEY
@@ -97,10 +71,6 @@ spec:
               value: {{.Env.HELM_CHART}}
             - name: HELM_RELEASE
               value: {{.Env.HELM_RELEASE}}
-            - name: PRE_DEPLOY_SCRIPT
-              value: {{.Env.PRE_DEPLOY_SCRIPT}}
-            - name: POST_DEPLOY_SCRIPT
-              value: {{.Env.POST_DEPLOY_SCRIPT}}
           workingDir: /workspace
           command:
             - /bin/sh
@@ -108,8 +78,8 @@ spec:
             - |
               set -e
 
-              {{ if ne (env.Getenv "PRE_DEPLOY_SCRIPT") "" }}
-              source /workspace/{{.Env.PRE_DEPLOY_SCRIPT}}
+              {{ if ne (env.Getenv "CI_PRE_DEPLOY_SCRIPT") "" }}
+              source /workspace/{{.Env.CI_PRE_DEPLOY_SCRIPT}}
               {{ end }}
 
               helm -n $K8S_NS template \
@@ -120,8 +90,8 @@ spec:
                   --namespace=$K8S_NS \
                   apply -f -
 
-              {{ if ne (env.Getenv "POST_DEPLOY_SCRIPT") "" }}
-              source /workspace/{{.Env.POST_DEPLOY_SCRIPT}}
+              {{ if ne (env.Getenv "CI_POST_DEPLOY_SCRIPT") "" }}
+              source /workspace/{{.Env.CI_POST_DEPLOY_SCRIPT}}
               {{ end }}
 
           securityContext:

@@ -55,7 +55,7 @@ replicaCount: 1
 
 image:
   repository: registry.gitlab.factory.social.gouv.fr/devthejo/webhook-k8s-ci
-  tag: 1.8.4
+  tag: 1.8.5
   pullPolicy: Always
 
 imagePullSecret: webhook-receiver-pullsecret
@@ -116,11 +116,11 @@ tolerations: []
 affinity: {}
 
 hooks:
-  build:
+  ci:
     enable: true
     hook:
-      id: build
-      execute-command: /opt/k8s-ci/build.sh
+      id: ci
+      execute-command: k8s-ci-run-job
       trigger-rule:
         match:
           type: value
@@ -129,75 +129,24 @@ hooks:
             source: url
             name: token
       command-working-directory: /opt
-      # response-message: OK
-      include-command-output-in-response: true
-      pass-environment-to-command:
-      - source: url
-        name: branch
-        envname: BRANCH
-      - source: url
-        name: context
-        envname: CONTEXT
-      files:
-  deploy:
-    enable: true
-    hook:
-      id: deploy
-      execute-command: /opt/k8s-ci/deploy.sh
-      trigger-rule:
-        match:
-          type: value
-          value: '{{ getenv "WEBHOOK_TOKEN" | js }}'
-          parameter:
-            source: url
-            name: token
-      command-working-directory: /opt
-      # response-message: OK
       response-headers:
         - name: Content-Type
           value: application/json
       include-command-output-in-response: true
       pass-environment-to-command:
       - source: url
-        name: branch
-        envname: BRANCH
-      - source: url
-        name: context
-        envname: CONTEXT
-      - source: url
-        name: production
-        envname: PRODUCTION
-      files:
-  build-n-deploy:
-    enable: true
-    hook:
-      id: build-n-deploy
-      command-working-directory: /opt
-      execute-command: /opt/k8s-ci/build-n-deploy.sh
-      trigger-rule:
-        match:
-          type: value
-          value: '{{ getenv "WEBHOOK_TOKEN" | js }}'
-          parameter:
-            source: url
-            name: token
-      command-working-directory: /opt
-      # response-message: OK
-      response-headers:
-        - name: Content-Type
-          value: application/json
-      include-command-output-in-response: true
-      pass-environment-to-command:
+        name: action
+        envname: CI_ACTION
       - source: url
         name: branch
-        envname: BRANCH
+        envname: CI_BRANCH
       - source: url
         name: context
-        envname: CONTEXT
+        envname: CI_CONTEXT
       - source: url
         name: production
-        envname: PRODUCTION
-      files:
+        envname: CI_PRODUCTION
+      - source: url
   # Leave this hook on all the time, disabling it will break livenessProbe
   status:
     enable: true

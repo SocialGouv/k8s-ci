@@ -86,6 +86,11 @@ spec:
             - /bin/sh
             - -c
             - |
+
+              {{ if ne (env.Getenv "CI_PRE_BUILD_SCRIPT") "" }}
+              source /workspace/{{.Env.CI_PRE_BUILD_SCRIPT}}
+              {{ end }}
+
               buildctl-daemonless.sh \
                 build \
                 --frontend dockerfile.v0 \
@@ -95,6 +100,14 @@ spec:
                 --export-cache mode=max,type=registry,ref={{.Env.REGISTRY_CACHE_URL}}/{{.Env.REGISTRY_CACHE_PUSH_PATH}}:{{.Env.REGISTRY_CACHE_TAG}} \
                 --import-cache type=registry,ref={{.Env.REGISTRY_CACHE_URL}}/{{.Env.REGISTRY_CACHE_PUSH_PATH}}:{{.Env.REGISTRY_CACHE_TAG}} \
                 {{ env.Getenv "BUILD_ARGS" }}
+
+              {{ if ne (env.Getenv "CI_POST_BUILD_SCRIPT") "" }}
+              source /workspace/{{.Env.CI_POST_BUILD_SCRIPT}}
+              {{ end }}
+
+              {{ if ne (env.Getenv "CI_NEXT_WEBHOOK") "" }}
+              source /workspace/{{.Env.CI_POST_BUILD_SCRIPT}}
+              {{ end }}
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000

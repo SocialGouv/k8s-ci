@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-. $(dirname $0)/env.sh
+. env.sh
 
 if [ -z "$K8S_DEPLOY_SERVER" ]; then
   echo "missing K8S_DEPLOY_SERVER env var, export from env.hook.sh at webhook install"

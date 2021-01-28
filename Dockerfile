@@ -43,4 +43,5 @@ RUN apk add --no-cache sed
 # jq
 RUN apk add --no-cache jq
 
+COPY /bin /usr/local/bin
 COPY /opt /opt

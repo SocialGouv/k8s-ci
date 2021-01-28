@@ -2,6 +2,7 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: jobs-cleanup
   labels:
     {{- include "webhook-receiver.labels" . | nindent 4 }}

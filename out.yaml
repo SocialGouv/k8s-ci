@@ -1,0 +1,346 @@
+---
+# Source: webhook-ci/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    cert: wildcard
+    helm.sh/chart: webhook-ci-1.0.0
+    app.kubernetes.io/name: webhook-ci
+    app.kubernetes.io/instance: myproject
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+  name: myproject
+---
+# Source: webhook-ci/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: myproject
+  name: myproject-webhook-ci
+  labels:
+    helm.sh/chart: webhook-ci-1.0.0
+    app.kubernetes.io/name: webhook-ci
+    app.kubernetes.io/instance: myproject
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: webhook-ci/templates/configmap.yaml
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  namespace: myproject
+  name: myproject-webhook-ci
+  labels:
+    helm.sh/chart: webhook-ci-1.0.0
+    app.kubernetes.io/name: webhook-ci
+    app.kubernetes.io/instance: myproject
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  kubectltoken: k8s
+  env.hook.sh: |
+    #!/usr/bin/env bash
+    
+    ### this file is embeded in webhook configmap when running create-webhook.sh
+    
+    # build vars
+    ## context
+    case $CI_CONTEXT in
+      app)
+        export BUILD_ARGS="$BUILD_ARGS \
+          --opt build-arg:REACT_APP_SENTRY_PUBLIC_DSN=${SENTRY_PUBLIC_DSN} \
+          "
+        ;;
+      api)
+        ;;
+      hasura)
+        ;;
+    esac
+    
+    
+    # deploy vars
+    if [ -n "$CI_PRODUCTION" ]; then
+      export ROOT_DOMAIN=emjpm.fabrique.social.gouv.fr
+      export RANCHER_CLUSTER_ID="c-lfcxv"
+      export RANCHER_PROJECT_ID="p-ttzld"
+    else
+      export ROOT_DOMAIN=emjpm.dev2.fabrique.social.gouv.fr
+      export RANCHER_CLUSTER_ID="c-bd7z2"
+      export RANCHER_PROJECT_ID="p-57mxc"
+    fi
+    export APP_DOMAIN="${DOMAIN_SLUG}-${ROOT_DOMAIN}"
+    export K8S_SERVER_ROOT_URL="https://rancher.fabrique.social.gouv.fr/k8s/clusters"
+    export K8S_DEPLOY_SERVER="$K8S_SERVER_ROOT_URL/$RANCHER_CLUSTER_ID"
+    export CI_PRE_DEPLOY_SCRIPT=".k8s/k8s-ci-hook/pre-deploy-script.sh"
+    
+    ## context
+    case $CI_CONTEXT in
+      app)
+        export CONTEXT_DOMAIN=$APP_DOMAIN
+        ;;
+      api)
+        export CONTEXT_DOMAIN="api-$APP_DOMAIN"
+        export HELM_ARGS="$HELM_ARGS
+          appURL=https://$APP_DOMAIN
+          dbName=$DB_NAME
+          "
+        ;;
+      hasura)
+        export CONTEXT_DOMAIN="hasura-$APP_DOMAIN"
+        export HELM_ARGS="$HELM_ARGS
+          dbName=$DB_NAME
+          "
+        ;;
+    esac
+    
+    ## prod / dev
+    if [ -n "$CI_PRODUCTION" ]; then
+      export HELM_ARGS="$HELM_ARGS
+        ingress.annotations.certmanager\.k8s\.io/cluster-issuer=letsencrypt-prod
+        --set-string ingress.annotations.kubernetes\.io/tls-acme=true
+        tlsSecretName=${CI_CONTEXT}-certificate
+        "
+    else
+      export HELM_ARGS="${HELM_ARGS}
+        tlsSecretName=wildcard-crt
+        "
+    fi
+    
+    ## common
+    export HELM_ARGS="$HELM_ARGS
+      labels.date=`date +'%s'`s
+      host=${CONTEXT_DOMAIN}
+      image.repository=${REGISTRY_URL}/${REGISTRY_PUSH_PATH}
+      image.tag=${IMAGE_TAG}
+      secretName=emjpm-secret
+      "
+    
+  hooks.yaml: |
+    - command-working-directory: /opt
+      execute-command: k8s-ci-run-job
+      id: deploy
+      include-command-output-in-response: true
+      pass-environment-to-command:
+      - envname: CI_ACTION
+        name: action
+        source: url
+      - envname: CI_BRANCH
+        name: branch
+        source: url
+      - envname: CI_CONTEXT
+        name: context
+        source: url
+      - envname: CI_PRODUCTION
+        name: production
+        source: url
+      - source: url
+      response-headers:
+      - name: Content-Type
+        value: application/json
+      trigger-rule:
+        match:
+          parameter:
+            name: token
+            source: url
+          type: value
+          value: '{{ getenv "WEBHOOK_TOKEN" | js }}'
+    - execute-command: k8s-ci-run-job
+      id: myCustomPipeline
+    - execute-command: /data/status.sh
+      id: status
+      include-command-output-in-response: true
+      response-message: Online
+  file__data_status.sh: |
+        #!/bin/sh
+        echo Online we are!
+---
+# Source: webhook-ci/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: myproject
+  name: myproject-webhook-ci
+  labels:
+    helm.sh/chart: webhook-ci-1.0.0
+    app.kubernetes.io/name: webhook-ci
+    app.kubernetes.io/instance: myproject
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9000
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: webhook-ci
+    app.kubernetes.io/instance: myproject
+---
+# Source: webhook-ci/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: myproject
+  name: myproject-webhook-ci
+  labels:
+    helm.sh/chart: webhook-ci-1.0.0
+    app.kubernetes.io/name: webhook-ci
+    app.kubernetes.io/instance: myproject
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+    timestamp: "2021-01-28 22:30:36.005338038 +0100 CET m=+0.058540543"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: webhook-ci
+      app.kubernetes.io/instance: myproject
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: webhook-ci
+        app.kubernetes.io/instance: myproject
+    spec:
+      serviceAccountName: myproject-webhook-ci
+      securityContext:
+        {}
+      imagePullSecrets:
+      - name: webhook-receiver-pullsecret
+      containers:
+        - name: webhook-ci
+          args:
+            - -verbose
+            - -hooks=/etc/webhook/hooks.yaml
+            - -hotreload
+            - -template
+          securityContext:
+            {}
+          image: "registry.gitlab.factory.social.gouv.fr/devthejo/webhook-k8s-ci:1.8.5"
+          imagePullPolicy: Always
+          env:
+          - name: SENTRY_PUBLIC_DSN
+            value: "https://d9ba9b75ff784cba87abd847b6162b02@sentry.fabrique.social.gouv.fr/3"
+          # SPECIFIC TO CI ENV FROM VALUES
+          - name: PROJECT
+            value: emjpm
+          - name: CI_CONTEXT_LIST
+            value: "hasura,api,app"
+          - name: WEBHOOK_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: ci-webhook-token
+                key: token
+          - name: K8S_NS
+            value: 
+          - name: K8S_SERVER
+            value: https://rancher.fabrique.social.gouv.fr/k8s/clusters/c-bd7z2
+          - name: K8S_JOB_TOKEN_SECRET_NAME
+            value: k8s
+          - name: K8S_JOB_TOKEN_SECRET_KEY
+            value: token
+          - name: K8S_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: k8s
+                key: token
+          - name: GIT_REPOSITORY
+            value: https://github.com/SocialGouv/emjpm
+          - name: GIT_BRANCH_DEFAULT
+            value: master
+          - name: GITCLONE_IMAGE
+            value: alpine/git
+          - name: GITCLONE_TAG
+            value: v2.30.0
+          - name: DOCKER_IMAGE
+            value: docker
+          - name: DOCKER_TAG
+            value: stable
+          - name: BUILDKIT_IMAGE
+            value: moby/buildkit
+          - name: BUILDKIT_TAG
+            value: v0.8.1-rootless
+          - name: BUILD_CONTEXT
+            value: 
+          - name: BUILD_DOCKERFILE
+            value: 
+          - name: REGISTRY_URL
+            value: harbor.fabrique.social.gouv.fr
+          - name: REGISTRY_SECRET_NAME
+            value: harbor-creds
+          - name: REGISTRY_USER_KEY
+            value: user
+          - name: REGISTRY_PASS_KEY
+            value: pass
+          - name: REGISTRY_PUSH_PATH
+            value: 
+          - name: REGISTRY_PUSH_TAG
+            value: latest
+          - name: REGISTRY_CACHE_TAG
+            value: buildcache
+          - name: REGISTRY_CACHE_URL
+            value: registry.dev2.fabrique.social.gouv.fr
+          - name: REGISTRY_CACHE_PUSH_PATH
+            value: 
+          - name: REGISTRY_CACHE_SECRET_NAME
+            value: registry-creds
+          - name: REGISTRY_CACHE_USER_KEY
+            value: user
+          - name: REGISTRY_CACHE_PASS_KEY
+            value: pass
+          ports:
+            - name: http
+              containerPort: 9000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /hooks/status
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /hooks/status
+              port: http
+          volumeMounts:
+            - name: configs
+              mountPath: "/opt/k8s-ci/jobs/env.hook.sh"
+              subPath: "env.hook.sh"
+            - name: configs
+              mountPath: "/etc/webhook/hooks.yaml"
+              subPath: "hooks.yaml"
+            - name: configs
+              mountPath: "/data/status.sh"
+              subPath: "file__data_status.sh"
+          resources:
+            {}
+      volumes:
+        - name: configs
+          configMap:
+            name: myproject-webhook-ci
+            defaultMode: 0755
+---
+# Source: webhook-ci/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  namespace: myproject
+  name: myproject-webhook-ci
+  labels:
+    helm.sh/chart: webhook-ci-1.0.0
+    app.kubernetes.io/name: webhook-ci
+    app.kubernetes.io/instance: myproject
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  tls:
+    - hosts:
+        - "k8s-ci-emjpm.dev2.fabrique.social.gouv.fr"
+      secretName: wildcard-crt
+  rules:
+    - host: "k8s-ci-emjpm.dev2.fabrique.social.gouv.fr"
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: myproject-webhook-ci
+              servicePort: 9000

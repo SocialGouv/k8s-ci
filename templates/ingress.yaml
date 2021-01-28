@@ -4,6 +4,7 @@
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
+  namespace: {{ .Release.Namespace }}
   name: {{ $fullName }}
   labels:
     {{- include "webhook-receiver.labels" . | nindent 4 }}

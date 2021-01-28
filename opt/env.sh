@@ -11,24 +11,25 @@ export K8S_TOKEN_SECRET_KEY=${K8S_TOKEN_SECRET_KEY:-"token"}
 export GIT_BRANCH_DEFAULT=${GIT_BRANCH_DEFAULT:-"master"}
 export GIT_BRANCH=${GIT_BRANCH:-"$GIT_BRANCH_DEFAULT"}
 
-export CONTEXT=${CONTEXT:-""}
-export PRE_DEPLOY_SCRIPT=${POST_DEPLOY_SCRIPT:-""}
-export POST_DEPLOY_SCRIPT=${POST_DEPLOY_SCRIPT:-""}
-export WAIT_FOR_JOB=${WAIT_FOR_JOB:-""}
-export PRODUCTION=${PRODUCTION:-""}
+export CI_CONTEXT=${CI_CONTEXT:-""}
+export CI_PRE_BUILD_SCRIPT=${CI_PRE_BUILD_SCRIPT:-""}
+export CI_POST_BUILD_SCRIPT=${CI_POST_BUILD_SCRIPT:-""}
+export CI_PRE_DEPLOY_SCRIPT=${CI_PRE_DEPLOY_SCRIPT:-""}
+export CI_POST_DEPLOY_SCRIPT=${CI_POST_DEPLOY_SCRIPT:-""}
+export CI_PRODUCTION=${CI_PRODUCTION:-""}
 
 # load variables from webhook url
-if [ -n "$BRANCH" ]; then
-  export GIT_BRANCH=$BRANCH
+if [ -n "$CI_BRANCH" ]; then
+  export GIT_BRANCH=$CI_BRANCH
 fi
 
 export SLUG_MAXSIZE=32
 export IMAGE_TAG=$(echo $GIT_BRANCH | sed -e 's/[^[:alnum:].]/-/g' | cut -c1-${SLUG_MAXSIZE})
 
 # build vars
-if [ -n "$CONTEXT" ]; then
-  export BUILD_DOCKERFILE=packages/$CONTEXT/
-  export REGISTRY_PUSH_PATH=$PROJECT/$CONTEXT
+if [ -n "$CI_CONTEXT" ]; then
+  export BUILD_DOCKERFILE=packages/$CI_CONTEXT/
+  export REGISTRY_PUSH_PATH=$PROJECT/$CI_CONTEXT
 else
   export REGISTRY_PUSH_PATH=$PROJECT/$PROJECT
 fi
@@ -43,10 +44,10 @@ export REGISTRY_CACHE_PASS_KEY=${REGISTRY_CACHE_PASS_KEY:-"$REGISTRY_PASS_KEY"}
 
 
 # deploy vars
-if [ -n "$CONTEXT" ]; then
-  export IMAGE_PATH=$PROJECT/$CONTEXT
-  export HELM_CHART=${HELM_CHART:-"packages/$CONTEXT/.k8s"}
-  export HELM_RELEASE=${HELM_RELEASE:-"$CONTEXT"}
+if [ -n "$CI_CONTEXT" ]; then
+  export IMAGE_PATH=$PROJECT/$CI_CONTEXT
+  export HELM_CHART=${HELM_CHART:-"packages/$CI_CONTEXT/.k8s"}
+  export HELM_RELEASE=${HELM_RELEASE:-"$CI_CONTEXT"}
 fi
 export HELM_CHART=${HELM_CHART:-".k8s"}
 export HELM_RELEASE=${HELM_RELEASE:-"$PROJECT"}
