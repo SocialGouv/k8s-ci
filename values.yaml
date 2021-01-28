@@ -63,7 +63,7 @@ replicaCount: 1
 
 image:
   repository: registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci
-  tag: 1.0.0
+  tag: latest
   pullPolicy: Always
 
 imagePullSecret: webhook-receiver-pullsecret
@@ -131,7 +131,7 @@ hooks:
     enable: true
     hook:
       id: ci
-      execute-command: k8s-ci-run-job
+      execute-command: /usr/local/bin/k8s-ci-run-job
       trigger-rule:
         match:
           type: value
@@ -163,6 +163,6 @@ hooks:
     enable: true
     hook:
       id: status
-      execute-command: k8s-ci-status
+      execute-command: /usr/local/bin/k8s-ci-status
       response-message: Online
       include-command-output-in-response: true
