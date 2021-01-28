@@ -1,0 +1,136 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: deploy-job-{{.Env.JOB_ID}}
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 100
+  template:
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      restartPolicy: Never
+      initContainers:
+        - name: git-clone-repo
+          image: {{.Env.GITCLONE_IMAGE}}:{{.Env.GITCLONE_TAG}}
+          command:
+            - sh
+            - -c
+            - |
+              git clone \
+                --depth 1 \
+                {{.Env.GIT_REPOSITORY}} \
+                --branch {{.Env.GIT_BRANCH}} \
+                --single-branch \
+                /workspace
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+        {{ if ne (env.Getenv "WAIT_FOR_JOB") "" }}
+        - name: wait-for-build-job-complete
+          image: registry.gitlab.factory.social.gouv.fr/devthejo/docker-kubectl-helm:1.1.0
+          env:
+            - name: K8S_SERVER
+              value: {{.Env.K8S_SERVER}}
+            - name: K8S_NS
+              value: {{.Env.K8S_NS}}
+            - name: K8S_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{.Env.K8S_JOB_TOKEN_SECRET_NAME}}
+                  key: {{.Env.K8S_JOB_TOKEN_SECRET_KEY}}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              kubectl \
+                --server=$K8S_SERVER \
+                --token=$K8S_TOKEN \
+                --namespace=$K8S_NS \
+                wait \
+                --for=condition=complete \
+                job/{{.Env.WAIT_FOR_JOB}} \
+                --timeout=60m
+        {{ end }}
+      containers:
+        - name: kube-deploy
+          image: registry.gitlab.factory.social.gouv.fr/devthejo/docker-kubectl-helm:1.1.0
+          env:
+            - name: K8S_SERVER
+              value: {{.Env.K8S_DEPLOY_SERVER}}
+            - name: K8S_NS
+              value: {{.Env.K8S_DEPLOY_NS}}
+            - name: K8S_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{.Env.K8S_TOKEN_SECRET_NAME}}
+                  key: {{.Env.K8S_TOKEN_SECRET_KEY}}
+            - name: PROJECT
+              value: {{.Env.PROJECT}}
+            - name: GIT_BRANCH
+              value: {{.Env.GIT_BRANCH}}
+            - name: GIT_REPOSITORY
+              value: {{.Env.GIT_REPOSITORY}}
+            - name: IMAGE_PATH
+              value: {{.Env.IMAGE_PATH}}
+            - name: IMAGE_TAG
+              value: {{.Env.IMAGE_TAG}}
+            - name: CONTEXT
+              value: {{.Env.CONTEXT}}
+            - name: PRODUCTION
+              value: {{.Env.PRODUCTION}}
+            - name: REGISTRY_URL
+              value: {{.Env.REGISTRY_URL}}
+            - name: REGISTRY_USER_KEY
+              value: {{.Env.REGISTRY_USER_KEY}}
+            - name: REGISTRY_PASS_KEY
+              value: {{.Env.REGISTRY_PASS_KEY}}
+            - name: HELM_ARGS
+              value: |
+{{ .Env.HELM_ARGS | strings.TrimSpace | strings.Indent 21 }}
+            - name: HELM_CHART
+              value: {{.Env.HELM_CHART}}
+            - name: HELM_RELEASE
+              value: {{.Env.HELM_RELEASE}}
+            - name: PRE_DEPLOY_SCRIPT
+              value: {{.Env.PRE_DEPLOY_SCRIPT}}
+            - name: POST_DEPLOY_SCRIPT
+              value: {{.Env.POST_DEPLOY_SCRIPT}}
+          workingDir: /workspace
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+
+              {{ if ne (env.Getenv "PRE_DEPLOY_SCRIPT") "" }}
+              source /workspace/{{.Env.PRE_DEPLOY_SCRIPT}}
+              {{ end }}
+
+              helm -n $K8S_NS template \
+                $HELM_ARGS \
+                $HELM_RELEASE $HELM_CHART \
+                | kubectl \
+                  --server=$K8S_SERVER --token=$K8S_TOKEN \
+                  --namespace=$K8S_NS \
+                  apply -f -
+
+              {{ if ne (env.Getenv "POST_DEPLOY_SCRIPT") "" }}
+              source /workspace/{{.Env.POST_DEPLOY_SCRIPT}}
+              {{ end }}
+
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+          volumeMounts:
+            - name: workspace
+              readOnly: true
+              mountPath: /workspace
+      volumes:
+        - name: workspace
+          emptyDir: {}
