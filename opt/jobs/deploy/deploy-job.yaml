@@ -33,7 +33,7 @@ spec:
               mountPath: /workspace
       containers:
         - name: k8s-deploy
-          image: registry.gitlab.factory.social.gouv.fr/devthejo/k8s-ci-deploy:1.0.0
+          image: {{env.Getenv "DEPLOY_JOB_IMAGE" "registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci/k8s-ci-deploy"}}:{{env.Getenv "DEPLOY_JOB_IMAGE_TAG" "latest"}}
           env:
             - name: K8S_SERVER
               value: {{.Env.K8S_DEPLOY_SERVER}}

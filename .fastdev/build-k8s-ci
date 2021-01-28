@@ -1,0 +1,9 @@
+#!/bin/sh
+
+TAG=$1
+if [ -n "$TAG" ]; then
+  docker build -t registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci:$TAG .
+  docker push registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci:$TAG
+fi
+docker build -t registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci:latest .
+docker push registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci:latest

@@ -104,6 +104,10 @@ spec:
             value: {{ .Values.registry.cacheUserKey }}
           - name: REGISTRY_CACHE_PASS_KEY
             value: {{ .Values.registry.cachePassKey }}
+          - name: DEPLOY_JOB_IMAGE
+            value: {{ .Values.deployJob.image }}
+          - name: DEPLOY_JOB_IMAGE_TAG
+            value: {{ .Values.deployJob.imageTag }}
           ports:
             - name: http
               containerPort: 9000
