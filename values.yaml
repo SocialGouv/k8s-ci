@@ -49,21 +49,14 @@ gitclone:
 
 labels: {}
 
-# Use this to insert env values into the deployment
 env: {}
-
-# Default values for webhook-receiver.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
 
 replicaCount: 1
 
 image:
   repository: registry.gitlab.factory.social.gouv.fr/devthejo/webhook-k8s-ci
-  # tag: latest
-  # pullPolicy: Always
   tag: 1.8.4
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 imagePullSecret: webhook-receiver-pullsecret
 
@@ -71,12 +64,8 @@ nameOverride: ""
 fullnameOverride: ""
 
 serviceAccount:
-  # Specifies whether a service account should be created
   create: true
-  # Annotations to add to the service account
   annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
   name:
 
 podSecurityContext: {}
@@ -164,6 +153,9 @@ hooks:
             name: token
       command-working-directory: /opt
       # response-message: OK
+      response-headers:
+        - name: Content-Type
+          value: application/json
       include-command-output-in-response: true
       pass-environment-to-command:
       - source: url
@@ -191,6 +183,9 @@ hooks:
             name: token
       command-working-directory: /opt
       # response-message: OK
+      response-headers:
+        - name: Content-Type
+          value: application/json
       include-command-output-in-response: true
       pass-environment-to-command:
       - source: url
