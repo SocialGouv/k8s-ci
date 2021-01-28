@@ -123,15 +123,16 @@ spec:
             - name: configs
               mountPath: "/etc/webhook/hooks.yaml"
               subPath: "hooks.yaml"
-          {{- range $key, $hook := .Values.hooks }}
-            {{- range $name, $val := $hook.files }}
-            {{- if $hook.enable }}
+            {{- range $name, $val := Values.files }}
             - name: configs
               mountPath: {{ $name | replace "%" "." | quote }}
               subPath: "file_{{ $name | replace "/" "_" | replace "%" "." }}"
             {{- end }}
+            {{- range $name, $val := {{ Values.actions }} }}
+            - name: configs
+              mountPath: /opt/jobs/{{ $name }}/create.sh
+              subPath: "file__opt_jobs_{{ $name | replace "/" "_" | replace "%" "." }}_create.sh"
             {{- end }}
-          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:

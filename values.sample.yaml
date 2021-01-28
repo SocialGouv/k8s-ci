@@ -24,12 +24,18 @@ ingress:
 
 labels: {}
 
+actions:
+  myCustomAction: |
+    #!/bin/sh
+    echo HELLO WORLD !
+
 # see https://github.com/geek-cookbook/helm-webhook-receiver
+# complex usage case, for simple actions use action instead
 hooks:
-  myCustomAction:
+  myCustomHook:
     enable: true
     hook:
-      id: myCustomAction
+      id: myCustomHook
       execute-command: myCustomScript.sh
     files:
 

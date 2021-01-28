@@ -115,6 +115,9 @@ tolerations: []
 
 affinity: {}
 
+actions: {}
+files: {}
+
 hooks:
   ci:
     enable: true
@@ -150,12 +153,8 @@ hooks:
   # Leave this hook on all the time, disabling it will break livenessProbe
   status:
     enable: true
-    files:
-      /data/status.sh: |
-        #!/bin/sh
-        echo Online we are!
     hook:
       id: status
-      execute-command: /data/status.sh
+      execute-command: k8s-ci-status
       response-message: Online
       include-command-output-in-response: true
