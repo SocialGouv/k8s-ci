@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 REGISTRY_NS="registry"
 AUTH_HOST="registry-auth.dev2.fabrique.social.gouv.fr"
