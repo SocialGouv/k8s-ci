@@ -1,5 +1,8 @@
 project: ""
 contextList: ""
+rancher:
+  clusterId: ""
+  projectId: ""
 
 git:
   repository:

@@ -13,12 +13,12 @@ data:
     - {{ $val.hook | toYaml | indent 6 | trim }}
   {{- end }}
 
-  {{- range $name, $val := {{ Values.files }} }}
+  {{- range $name, $val := .Values.files }}
   file_{{ $name | replace "/" "_" | replace "%" "." }}: |
 {{ $val | indent 8 }}
   {{- end }}
 
-  {{- range $name, $val := {{ Values.actions }} }}
+  {{- range $name, $val := .Values.actions }}
   file__opt_jobs_{{ $name | replace "/" "_" | replace "%" "." }}_create.sh: |
 {{ $val | indent 8 }}
   {{- end }}

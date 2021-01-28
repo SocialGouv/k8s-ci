@@ -5,7 +5,7 @@ metadata:
   name: {{ include "webhook-receiver.fullname" . }}
   labels:
     {{- include "webhook-receiver.labels" . | nindent 4 }}
-    timestamp: {{ now | quote }}
+    timestamp: "{{ now | date "20060102150405" }}"
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -123,12 +123,12 @@ spec:
             - name: configs
               mountPath: "/etc/webhook/hooks.yaml"
               subPath: "hooks.yaml"
-            {{- range $name, $val := Values.files }}
+            {{- range $name, $val := .Values.files }}
             - name: configs
               mountPath: {{ $name | replace "%" "." | quote }}
               subPath: "file_{{ $name | replace "/" "_" | replace "%" "." }}"
             {{- end }}
-            {{- range $name, $val := {{ Values.actions }} }}
+            {{- range $name, $val := .Values.actions }}
             - name: configs
               mountPath: /opt/jobs/{{ $name }}/create.sh
               subPath: "file__opt_jobs_{{ $name | replace "/" "_" | replace "%" "." }}_create.sh"

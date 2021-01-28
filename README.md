@@ -19,7 +19,7 @@ kubectl -n k8s-ci-myproject create secret generic ci-webhook-token \
 
 let's deploy the webhook:
 ```sh
-helm -n myproject template myproject -f values.sample.yaml . | kubectl apply -f -
+helm -n k8s-ci-myproject template k8s-ci-myproject -f values.sample.yaml . | kubectl create -f -
 ```
 
 ## examples
@@ -111,9 +111,10 @@ based on and inspirations:
 ### TODO (help and collab is very welcome ;))
 
 - clean and simple pipeline configuration system:
-  - stages (need a little more reflection on how deal with that)
-  - gitlab-ci needs likes
+  - fractal arborescence with optional loops and parametrable parallelisation
+    (like in snip, a go ops tool I've developed, can be a good base)
   - stop webhook job based on annotations
+  - expose logs (eg: from loki)
 
 ### about
 Why ?

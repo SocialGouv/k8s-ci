@@ -1,5 +1,8 @@
 project: emjpm
 contextList: "hasura,api,app"
+rancher:
+  clusterId: c-bd7z2
+  projectId: p-57mxc
 git:
   repository: https://github.com/SocialGouv/emjpm
 env:
@@ -24,20 +27,20 @@ ingress:
 
 labels: {}
 
-actions:
-  myCustomAction: |
-    #!/bin/sh
-    echo HELLO WORLD !
+# actions:
+#   myCustomAction: |
+#     #!/bin/sh
+#     echo HELLO WORLD !
 
 # see https://github.com/geek-cookbook/helm-webhook-receiver
 # complex usage case, for simple actions use action instead
-hooks:
-  myCustomHook:
-    enable: true
-    hook:
-      id: myCustomHook
-      execute-command: myCustomScript.sh
-    files:
+# hooks:
+#   myCustomHook:
+#     enable: true
+#     hook:
+#       id: myCustomHook
+#       execute-command: myCustomScript.sh
+#     files:
 
 
 

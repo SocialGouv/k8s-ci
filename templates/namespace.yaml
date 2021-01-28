@@ -4,4 +4,7 @@ metadata:
   labels:
     cert: wildcard
     {{- include "webhook-receiver.labels" . | nindent 4 }}
+    field.cattle.io/projectId: {{ required "rancher.projectId must be specified" .Values.rancher.projectId }}
+  annotations:
+    field.cattle.io/projectId: {{ required "rancher.clusterId must be specified" .Values.rancher.clusterId }}:{{ required "rancher.projectId must be specified" .Values.rancher.projectId }}
   name: {{ .Release.Namespace }}

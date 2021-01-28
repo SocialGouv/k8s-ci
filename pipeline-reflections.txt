@@ -1,0 +1,7 @@
+pipeline (fractal snip like):
+  - loop_on: context
+    parallel: true
+    play:
+      - build
+      - deploy
+  - job: notify all is ok
