@@ -87,14 +87,14 @@ envHookFile: |
     api)
       export CONTEXT_DOMAIN="api-$APP_DOMAIN"
       export HELM_ARGS="$HELM_ARGS
-        appURL=https://$APP_DOMAIN
-        dbName=$DB_NAME
+        --set appURL=https://$APP_DOMAIN
+        --set dbName=$DB_NAME
         "
       ;;
     hasura)
       export CONTEXT_DOMAIN="hasura-$APP_DOMAIN"
       export HELM_ARGS="$HELM_ARGS
-        dbName=$DB_NAME
+        --set dbName=$DB_NAME
         "
       ;;
   esac
@@ -102,20 +102,20 @@ envHookFile: |
   ## prod / dev
   if [ -n "$CI_PRODUCTION" ]; then
     export HELM_ARGS="$HELM_ARGS
-      ingress.annotations.certmanager\.k8s\.io/cluster-issuer=letsencrypt-prod
+      --set ingress.annotations.certmanager\.k8s\.io/cluster-issuer=letsencrypt-prod
       --set-string ingress.annotations.kubernetes\.io/tls-acme=true
-      tlsSecretName=${CI_CONTEXT}-certificate
+      --set tlsSecretName=${CI_CONTEXT}-certificate
       "
   else
     export HELM_ARGS="${HELM_ARGS}
-      tlsSecretName=wildcard-crt
+      --set tlsSecretName=wildcard-crt
       "
   fi
 
   ## common
   export HELM_ARGS="$HELM_ARGS
-    host=${CONTEXT_DOMAIN}
-    image.repository=${REGISTRY_URL}/${REGISTRY_PUSH_PATH}
-    image.tag=${IMAGE_TAG}
-    secretName=emjpm-secret
+    --set host=${CONTEXT_DOMAIN}
+    --set image.repository=${REGISTRY_URL}/${REGISTRY_PUSH_PATH}
+    --set image.tag=${IMAGE_TAG}
+    --set secretName=emjpm-secret
     "
