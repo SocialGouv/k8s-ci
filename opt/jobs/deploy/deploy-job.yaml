@@ -71,6 +71,8 @@ spec:
               value: {{.Env.HELM_CHART}}
             - name: HELM_RELEASE
               value: {{.Env.HELM_RELEASE}}
+            - name: DB_NAME
+              value: {{.Env.DB_NAME}}
           workingDir: /workspace
           command:
             - /bin/sh
