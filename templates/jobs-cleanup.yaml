@@ -33,11 +33,5 @@ spec:
                   --token $K8S_TOKEN \
                   delete jobs \
                     --field-selector status.successful=1
-                kubectl \
-                  --namespace {{ .Values.k8sJobsNamespace }} \
-                  --server $K8S_SERVER \
-                  --token $K8S_TOKEN \
-                  get pods --field-selector 'status.phase=Failed' -o name \
-                    | xargs kubectl delete
           restartPolicy: Never
 {{ end }}
