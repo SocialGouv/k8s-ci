@@ -110,11 +110,37 @@ based on and inspirations:
 
 ### TODO (help and collab is very welcome ;))
 
+- stop webhook job based on annotations
+- expose logs (eg: from loki)
 - clean and simple pipeline configuration system:
-  - fractal arborescence with optional loops and parametrable parallelisation
-    (like in snip, a go ops tool I've developed, can be a good base)
-  - stop webhook job based on annotations
-  - expose logs (eg: from loki)
+- fractal arborescence with optional loops and parametrable parallelisation
+  (like in snip, a go ops tool I've developed, can be a good base)
+
+eg for pipeline definition:
+```yaml
+actions:
+- name: build-packages
+  parallel: true
+  loop_on:
+    - CONTEXT: app
+    - CONTEXT: api
+    - CONTEXT: hasura
+  actions:
+    - action: lint
+    - action: test
+    - action: build
+- action: create-namespace
+- action: create-db
+- name: deploy
+  parallel: true
+  loop_on:
+    - CONTEXT: app
+    - CONTEXT: api
+    - CONTEXT: hasura
+  actions:
+    - action: deploy
+- action: notify-mattermost
+```
 
 ### about
 Why ?
