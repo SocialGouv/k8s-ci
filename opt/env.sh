@@ -57,6 +57,6 @@ export K8S_DEPLOY_NS="${PROJECT}-$(echo $GIT_BRANCH | sed -e 's/[^[:alnum:]]/-/g
 export DB_NAME="${PROJECT}_$(echo $GIT_BRANCH | sed -e 's/[^[:alnum:]]/-/g' | cut -c1-${SLUG_MAXSIZE})"
 
 
-if [ -f "$(dirname $0)/env.hook.sh" ]; then
-  . $(dirname $0)/env.hook.sh
+if [ -f "/opt/env.hook.sh" ]; then
+  . /opt/env.hook.sh
 fi

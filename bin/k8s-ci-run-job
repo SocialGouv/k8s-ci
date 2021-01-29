@@ -37,9 +37,11 @@ if [ -n "$CI_CONTEXT" ]; then
   CI_CONTEXT_LIST=$CI_CONTEXT
   for context in $(echo $CI_CONTEXT_LIST | sed "s/,/ /g"); do
     export CI_CONTEXT=$context
-    runJob
+    export JOB_ID=${JOB_ID:-"$(uuidgen)"}
+    runJob || break
   done
 else
+  export JOB_ID=${JOB_ID:-"$(uuidgen)"}
   runJob
 fi
 
