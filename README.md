@@ -112,8 +112,9 @@ based on and inspirations:
 
 - stop webhook job based on annotations
 - expose logs (eg: from loki)
+- cache system for running tests (based on k8s pvc)
 - clean and simple pipeline configuration system:
-- fractal arborescence with optional loops and parametrable parallelisation
+  fractal arborescence with optional loops and parametrable parallelisation
   (like in snip, a go ops tool I've developed, can be a good base)
 
 eg for pipeline definition:
