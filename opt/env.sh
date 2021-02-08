@@ -53,9 +53,14 @@ export HELM_CHART=${HELM_CHART:-".k8s"}
 export HELM_RELEASE=${HELM_RELEASE:-"$PROJECT"}
 
 export DOMAIN_SLUG=$(echo $GIT_BRANCH | sed -e 's/[^[:alnum:]]/-/g' | cut -c1-${SLUG_MAXSIZE})
-export K8S_DEPLOY_NS="${PROJECT}-$(echo $GIT_BRANCH | sed -e 's/[^[:alnum:]]/-/g' | cut -c1-${SLUG_MAXSIZE})"
-export DB_NAME="${PROJECT}_$(echo $GIT_BRANCH | sed -e 's/[^[:alnum:]]/_/g' | cut -c1-${SLUG_MAXSIZE})"
 
+if [ -z "$CI_PRODUCTION" ]; then
+  export K8S_DEPLOY_NS="${PROJECT}-$(echo $GIT_BRANCH | sed -e 's/[^[:alnum:]]/-/g' | cut -c1-${SLUG_MAXSIZE})"
+  export DB_NAME="${PROJECT}_$(echo $GIT_BRANCH | sed -e 's/[^[:alnum:]]/_/g' | cut -c1-${SLUG_MAXSIZE})"
+else
+  export K8S_DEPLOY_NS="${PROJECT}"
+  export DB_NAME="${PROJECT}"
+fi
 
 if [ -f "/opt/env.hook.sh" ]; then
   . /opt/env.hook.sh
