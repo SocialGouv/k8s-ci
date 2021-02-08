@@ -57,7 +57,7 @@ spec:
             - name: CI_CONTEXT
               value: {{.Env.CI_CONTEXT}}
             - name: CI_PRODUCTION
-              value: {{.Env.CI_PRODUCTION}}
+              value: "{{.Env.CI_PRODUCTION}}"
             - name: REGISTRY_URL
               value: {{.Env.REGISTRY_URL}}
             - name: REGISTRY_USER_KEY
