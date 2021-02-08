@@ -116,7 +116,6 @@ based on and inspirations:
 - clean and simple pipeline configuration system:
   fractal arborescence with optional loops and parametrable parallelisation
   (like in snip, a go ops tool I've developed, can be a good base)
-
 eg for pipeline definition:
 ```yaml
 actions:
@@ -142,6 +141,12 @@ actions:
     - action: deploy
 - action: notify-mattermost
 ```
+- pipeline visualisation, log and triggering app
+  view arborescence using [react-tree-graph](https://github.com/jpb12/react-tree-graph)
+- connect using basic auth nginx sidecar
+- explore [brigade](https://github.com/brigadecore/brigade) and [kashti](https://github.com/brigadecore/kashti)
+- simple .k8s-ci/run.sh implementation (with default to snip)
+- then run jobs from .k8s/jobs/* from the project
 
 ### about
 Why ?
