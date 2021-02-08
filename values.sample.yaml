@@ -13,7 +13,7 @@ kubectl:
   server: https://rancher.fabrique.social.gouv.fr/k8s/clusters/c-bd7z2
   tokenSecretName: k8s
   tokenSecretKey: token
-  k8sJobsNamespace: k8s-jobs-emjpm
+k8sJobsNamespace: k8s-jobs-emjpm
 ingress:
   enabled: true
   hosts:
