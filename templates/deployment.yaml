@@ -5,7 +5,6 @@ metadata:
   name: {{ include "webhook-receiver.fullname" . }}
   labels:
     {{- include "webhook-receiver.labels" . | nindent 4 }}
-    timestamp: "{{ now | date "20060102150405" }}"
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -13,6 +12,8 @@ spec:
       {{- include "webhook-receiver.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      annotations:
+        timestamp: "{{ now | date "20060102150405" }}"
       labels:
         {{- include "webhook-receiver.selectorLabels" . | nindent 8 }}
     spec:
