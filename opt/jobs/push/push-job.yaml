@@ -61,13 +61,13 @@ spec:
             - name: workspace
               readOnly: true
               mountPath: /workspace
-            - name: customJobsSecrets
+            - name: custom-jobs-secrets
               readOnly: true
               mountPath: /secrets
 
       volumes:
         - name: workspace
           emptyDir: {}
-        - name: customJobsSecrets
+        - name: custom-jobs-secrets
           secret:
             secretName: {{.Env.K8SCI_CUSTOM_SECRET_NAME}}
