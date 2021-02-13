@@ -3,9 +3,7 @@ rancher:
   clusterId: ""
   projectId: ""
 
-git:
-  repository:
-  branchDefault: master
+repository:
 
 branches: []
 
@@ -20,11 +18,10 @@ kubectl:
   tokenSecretKey: token
   tokenSecretValue: ""
 
-k8sJobsNamespace:
-
-gitclone:
-  image: alpine/git
-  tag: v2.30.0
+jobs:
+  namespace:
+  customSecretName: jobs-secrets
+  customSecretValues: {}
 
 labels: {}
 

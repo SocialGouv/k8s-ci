@@ -1,0 +1,4 @@
+#!/bin/sh
+
+$(dirname $0)/build-k8sci
+$(dirname $0)/build-push-runner

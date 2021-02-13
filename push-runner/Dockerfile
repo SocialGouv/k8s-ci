@@ -15,6 +15,7 @@ COPY --from=gomplate /gomplate /usr/local/bin/gomplate
 RUN set -ex \
   #
   && apk add --update --no-cache \
+    util-linux \
     bash=~5 \
     coreutils=~8 \
     gettext=~0 \

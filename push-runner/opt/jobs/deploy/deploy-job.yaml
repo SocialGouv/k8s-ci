@@ -4,7 +4,7 @@ metadata:
   name: runner-{{.Env.K8SCI_GID}}-deploy-{{.Env.K8SCI_CONTEXT}}
 spec:
   backoffLimit: 2
-  ttlSecondsAfterFinished: 100
+  ttlSecondsAfterFinished: 1800
   template:
     spec:
       securityContext:
@@ -14,14 +14,14 @@ spec:
       restartPolicy: Never
       initContainers:
         - name: git-clone-repo
-          image: {{.Env.K8SCI_GITCLONE_IMAGE}}:{{.Env.K8SCI_GITCLONE_TAG}}
+          image: alpine/git:v2.30.0
           command:
             - sh
             - -c
             - |
               git clone \
                 --depth 1 \
-                {{.Env.K8SCI_GIT_REPOSITORY}} \
+                {{.Env.K8SCI_REPOSITORY}} \
                 --branch {{.Env.K8SCI_BRANCH}} \
                 --single-branch \
                 /workspace
@@ -33,7 +33,7 @@ spec:
               mountPath: /workspace
       containers:
         - name: k8s-deploy
-          image: {{env.Getenv "DEPLOY_JOB_IMAGE" "registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci/k8s-ci-deploy"}}:{{env.Getenv "DEPLOY_JOB_IMAGE_TAG" "latest"}}
+          image: {{env.Getenv "K8SCI_DEPLOY_JOB_IMAGE" "registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci/push-runner"}}:{{env.Getenv "K8SCI_DEPLOY_JOB_TAG" "latest"}}
           env:
             - name: K8S_SERVER
               value: {{.Env.K8SCI_K8S_DEPLOY_SERVER}}

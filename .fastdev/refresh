@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+
+if [ -z "$K8SCI_NS" ]; then
+  echo "missing env var K8SCI_NS"
+  exit 1
+fi
+
+$(dirname $0)/build
+helm -n $K8SCI_NS template $K8SCI_NS -f values.sample.yaml . | kubectl apply -f -
+kubectl -n $K8SCI_NS rollout status deployment "${K8SCI_NS}-webhook-ci"
