@@ -1,4 +1,4 @@
-# k8s-ci ✨☄️
+# k8sci ✨☄️
 
 ## features
 - blazing fast pipeline 🚀

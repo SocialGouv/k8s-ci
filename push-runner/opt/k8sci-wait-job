@@ -1,0 +1,30 @@
+#!/bin/sh
+set -e
+
+K8SCI_WAIT_JOB_TYPE=${K8SCI_WAIT_JOB_TYPE:-"$1"}
+K8SCI_CONTEXT=${K8SCI_CONTEXT:-"$2"}
+K8SCI_WAIT_TIMEOUT=${K8SCI_WAIT_TIMEOUT:-"$3"}
+K8SCI_WAIT_TIMEOUT=${K8SCI_WAIT_TIMEOUT:-"60m"}
+
+if [ -z "$K8SCI_WAIT_JOB_TYPE" ]; then
+  echo "missing 1 required argument or K8SCI_WAIT_JOB_TYPE env var"
+  exit 1
+fi
+if [ -z "$K8SCI_GID" ]; then
+  echo "missing K8SCI_GID env var"
+  exit 1
+fi
+
+
+if kubectl \
+  --server=$K8SCI_K8S_SERVER --token=$K8SCI_K8S_TOKEN \
+  --namespace=$K8SCI_K8S_NS \
+  wait \
+    --for=condition=complete \
+    "job/ci-${K8SCI_GID}-${K8SCI_WAIT_JOB_TYPE}-${K8SCI_CONTEXT}" \
+    --timeout=$K8SCI_WAIT_TIMEOUT; then
+  echo '{"status":"succeed"}'
+else
+  echo '{"status":"failed"}'
+  exit 1
+fi

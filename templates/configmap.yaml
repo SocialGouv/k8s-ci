@@ -9,7 +9,7 @@ data:
   kubectltoken: {{ required "kubectl.tokenSecretName must be specified" .Values.kubectl.tokenSecretName }}
   hooks.yaml: |
     - id: push
-      execute-command: /opt/k8s-ci-push
+      execute-command: /opt/k8sci-push
       trigger-rule:
         and:
           - or: # token match
@@ -70,6 +70,6 @@ data:
           envname: K8SCI_BRANCH
 
     - id: status
-      execute-command: /opt/k8s-ci-status
+      execute-command: /opt/k8sci-status
       response-message: Online
       include-command-output-in-response: true

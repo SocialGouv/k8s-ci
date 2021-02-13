@@ -41,6 +41,8 @@ RUN set -ex \
   && mv /linux-amd64/helm /usr/local/bin/helm \
   ;
 
+COPY /opt /opt
+
 USER 1000
 ENTRYPOINT [ "/bin/sh", "-c" ]
 CMD []
