@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: ci-{{.Env.K8SCI_GID}}-deploy-{{.Env.K8SCI_CONTEXT}}
+  name: runner-{{.Env.K8SCI_GID}}-deploy-{{.Env.K8SCI_CONTEXT}}
 spec:
   backoffLimit: 2
   ttlSecondsAfterFinished: 100

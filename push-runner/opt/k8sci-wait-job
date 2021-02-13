@@ -21,7 +21,7 @@ if kubectl \
   --namespace=$K8SCI_K8S_NS \
   wait \
     --for=condition=complete \
-    "job/ci-${K8SCI_GID}-${K8SCI_WAIT_JOB_TYPE}-${K8SCI_CONTEXT}" \
+    "job/runner-${K8SCI_GID}-${K8SCI_WAIT_JOB_TYPE}-${K8SCI_CONTEXT}" \
     --timeout=$K8SCI_WAIT_TIMEOUT; then
   echo '{"status":"succeed"}'
 else
