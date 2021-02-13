@@ -53,6 +53,7 @@ spec:
             - /bin/sh
             - -c
             - |
+              set -e
               {{.Env.K8SCI_PUSH_RUNNER_COMMAND | strings.Indent 14 }}
           securityContext:
             runAsUser: 1000
