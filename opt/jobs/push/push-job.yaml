@@ -39,7 +39,7 @@ spec:
               value: {{.Env.K8SCI_K8S_SERVER}}
             - name: K8SCI_K8S_NS
               value: {{.Env.K8SCI_K8S_NS}}
-            - name: K8S_TOKEN
+            - name: K8SCI_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: {{.Env.K8SCI_K8S_TOKEN_SECRET_NAME}}
