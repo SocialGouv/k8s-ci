@@ -4,6 +4,7 @@ metadata:
   name: runner-{{.Env.K8SCI_GID}}-deploy-{{.Env.K8SCI_CONTEXT}}
 spec:
   backoffLimit: 2
+  activeDeadlineSeconds: 600
   ttlSecondsAfterFinished: 1800
   template:
     spec:

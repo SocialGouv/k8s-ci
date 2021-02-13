@@ -4,6 +4,7 @@ metadata:
   name: push-{{.Env.JOB_ID}}
 spec:
   backoffLimit: 0
+  activeDeadlineSeconds: 3600
   ttlSecondsAfterFinished: 1800
   template:
     spec:
