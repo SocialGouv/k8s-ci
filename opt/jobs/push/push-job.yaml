@@ -1,9 +1,9 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: push-job-{{.Env.JOB_ID}}
+  name: push-{{.Env.JOB_ID}}
 spec:
-  backoffLimit: 2
+  backoffLimit: 0
   ttlSecondsAfterFinished: 1800
   template:
     spec:
