@@ -16,16 +16,32 @@ if [ -z "$K8SCI_GID" ]; then
   exit 1
 fi
 
-
-if kubectl \
+kubectl \
   --server=$K8SCI_K8S_SERVER --token=$K8SCI_K8S_TOKEN \
   --namespace=$K8SCI_K8S_NS \
   wait \
     --for=condition=complete \
     "job/runner-${K8SCI_GID}-${K8SCI_WAIT_JOB_TYPE}-${K8SCI_CONTEXT}" \
-    --timeout=$K8SCI_WAIT_TIMEOUT; then
+    --timeout=$K8SCI_WAIT_TIMEOUT &
+completion_pid=$!
+
+kubectl \
+  --server=$K8SCI_K8S_SERVER --token=$K8SCI_K8S_TOKEN \
+  --namespace=$K8SCI_K8S_NS \
+  wait \
+    --for=condition=failed \
+    "job/runner-${K8SCI_GID}-${K8SCI_WAIT_JOB_TYPE}-${K8SCI_CONTEXT}" \
+    --timeout=$K8SCI_WAIT_TIMEOUT  && exit 1 &
+failure_pid=$!
+
+wait -n $completion_pid $failure_pid
+
+exit_code=$?
+
+if (( $exit_code == 0 )); then
   echo '{"status":"succeed"}'
 else
   echo '{"status":"failed"}'
-  exit 1
 fi
+
+exit $exit_code
