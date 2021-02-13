@@ -1,4 +1,3 @@
-{{ if .Values.k8sJobsNamespace }}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
@@ -28,10 +27,11 @@ spec:
               - -c
               - |
                 kubectl \
-                  --namespace {{ .Values.k8sJobsNamespace }} \
+                  --namespace {{ default .Values.k8sJobsNamespace .Release.Namespace }} \
                   --server $K8S_SERVER \
                   --token $K8S_TOKEN \
                   delete jobs \
                     --field-selector status.successful=1
+                kubectl delete pods --field-selector status.phase=Failed \
+                  --namespace {{ default .Values.k8sJobsNamespace .Release.Namespace }}
           restartPolicy: Never
-{{ end }}

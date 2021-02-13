@@ -1,5 +1,4 @@
 project: ""
-contextList: ""
 rancher:
   clusterId: ""
   projectId: ""
@@ -8,48 +7,20 @@ git:
   repository:
   branchDefault: master
 
+branches: []
+
 webhook:
-  tokenSecretName: ""
-  tokenSecretKey: "token"
+  tokenSecretName: ci-webhook-token
+  tokenSecretKey: token
+  createSecret: false
 
 kubectl:
   server: ""
-  tokenSecretName: ""
+  tokenSecretName: k8s
   tokenSecretKey: token
+  tokenSecretValue: ""
 
 k8sJobsNamespace:
-
-registry:
-  url: harbor.fabrique.social.gouv.fr
-  # url: registry2.dev2.fabrique.social.gouv.fr
-  pushPath:
-  secretName: harbor-creds
-  # secretName: registry2-creds
-  userKey: user
-  passKey: pass
-  pushTag: latest
-  cacheTag: buildcache
-  cacheUrl: registry.dev2.fabrique.social.gouv.fr
-  cachePushPath:
-  cacheSecretName: registry-creds
-  cacheUserKey: user
-  cachePassKey: pass
-
-build:
-  context: ""
-  dockerfile: ""
-
-buildkit:
-  image: moby/buildkit
-  # tag: "master-rootless
-  tag: v0.8.1-rootless
-docker:
-  image: docker
-  tag: stable
-
-deployJob:
-  image: registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci/k8s-ci-deploy
-  imageTag: latest
 
 gitclone:
   image: alpine/git
@@ -61,12 +32,17 @@ env: {}
 
 replicaCount: 1
 
-image:
-  repository: registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci
+deploy:
+  image: registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci
   tag: latest
   pullPolicy: Always
+  pullSecret: "registry-creds"
 
-imagePullSecret: webhook-receiver-pullsecret
+pushRunner:
+  image: registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci/push-runner
+  tag: latest
+  command: .k8sci/run.sh
+
 
 nameOverride: ""
 fullnameOverride: ""
@@ -92,18 +68,13 @@ service:
   port: 9000
 
 ingress:
-  enabled: true
+  enabled: false
   annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
   hosts:
     - host: webhook-receiver.chart.local
       paths:
         - /
   tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -122,47 +93,3 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
-
-actions: {}
-files: {}
-
-hooks:
-  ci:
-    enable: true
-    hook:
-      id: ci
-      execute-command: /usr/local/bin/k8s-ci-run-job
-      trigger-rule:
-        match:
-          type: value
-          value: '{{ getenv "WEBHOOK_TOKEN" | js }}'
-          parameter:
-            source: url
-            name: token
-      command-working-directory: /opt
-      response-headers:
-        - name: Content-Type
-          value: application/json
-      include-command-output-in-response: true
-      pass-environment-to-command:
-      - source: url
-        name: action
-        envname: CI_ACTION
-      - source: url
-        name: branch
-        envname: CI_BRANCH
-      - source: url
-        name: context
-        envname: CI_CONTEXT
-      - source: url
-        name: production
-        envname: CI_PRODUCTION
-      - source: url
-  # Leave this hook on all the time, disabling it will break livenessProbe
-  status:
-    enable: true
-    hook:
-      id: status
-      execute-command: /usr/local/bin/k8s-ci-status
-      response-message: Online
-      include-command-output-in-response: true

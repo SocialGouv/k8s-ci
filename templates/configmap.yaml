@@ -7,18 +7,69 @@ metadata:
     {{- include "webhook-receiver.labels" . | nindent 4 }}
 data:
   kubectltoken: {{ required "kubectl.tokenSecretName must be specified" .Values.kubectl.tokenSecretName }}
-  env.hook.sh: |
-{{ .Values.envHookFile | indent 4 }}
-  hooks.yaml: | {{- range $key, $val := .Values.hooks }}
-    - {{ $val.hook | toYaml | indent 6 | trim }}
-  {{- end }}
+  hooks.yaml: |
+    - id: push
+      execute-command: /opt/k8s-ci-push
+      trigger-rule:
+        and:
+          - or: # token match
+            - match: # url ?token=
+                type: value
+                value: '{{"{{"}} getenv "K8SCI_WEBHOOK_TOKEN" | js {{"}}"}}'
+                parameter:
+                  source: url
+                  name: token
+            - match: # github webhook
+                type: payload-hmac-sha1
+                secret: '{{"{{"}} getenv "K8SCI_WEBHOOK_TOKEN" | js {{"}}"}}'
+                parameter:
+                  source: header
+                  name: X-Hub-Signature
+            - match: # gitlab webhook
+                type: value
+                value: '{{"{{"}} getenv "K8SCI_WEBHOOK_TOKEN" | js {{"}}"}}'
+                parameter:
+                  source: header
+                  name: X-Gitlab-Token
+            - match: # gitea webhook
+                type: value
+                value: '{{"{{"}} getenv "K8SCI_WEBHOOK_TOKEN" | js {{"}}"}}'
+                parameter:
+                  source: payload
+                  name: secret
+          {{ if ne (len .Values.branches) 0 }}
+          - or: # webhook branches
+            {{ range $i, $branch := .Values.branches }}
+            - match:
+                type: value
+                value: refs/heads/{{ $branch }}
+                parameter:
+                  source: payload
+                  name: ref
+            {{ end }}
+          {{ end }}
+          - or: # request branch
+            - match:
+                type: regex
+                regex: .*
+                parameter:
+                  source: url
+                  name: branch
 
-  {{- range $name, $val := .Values.files }}
-  file_{{ $name | replace "/" "_" | replace "%" "." }}: |
-{{ $val | indent 8 }}
-  {{- end }}
+      command-working-directory: /opt
+      response-headers:
+        - name: Content-Type
+          value: application/json
+      include-command-output-in-response: true
+      pass-environment-to-command:
+        - source: payload
+          name: ref
+          envname: K8SCI_REF
+        - source: url
+          name: branch
+          envname: K8SCI_BRANCH
 
-  {{- range $name, $val := .Values.actions }}
-  file__opt_jobs_{{ $name | replace "/" "_" | replace "%" "." }}_create.sh: |
-{{ $val | indent 8 }}
-  {{- end }}
+    - id: status
+      execute-command: /opt/k8s-ci-status
+      response-message: Online
+      include-command-output-in-response: true

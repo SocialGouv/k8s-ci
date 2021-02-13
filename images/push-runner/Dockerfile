@@ -1,4 +1,7 @@
 ARG ALPINE_VERSION=3.13
+ARG GOMPLATE_VERSION=v3.6.0-slim
+
+FROM hairyhenderson/gomplate:$GOMPLATE_VERSION as gomplate
 FROM alpine:$ALPINE_VERSION
 
 ARG KUBECTL_VERSION=1.20.1
@@ -6,6 +9,8 @@ ARG KUBECTL_VERSION=1.20.1
 ARG KUSTOMIZE_VERSION=3.5.2
 
 ARG HELM_VERSION=3.4.2
+
+COPY --from=gomplate /gomplate /usr/local/bin/gomplate
 
 RUN set -ex \
   #

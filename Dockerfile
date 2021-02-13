@@ -24,5 +24,4 @@ RUN set -ex \
   && chmod +x /dev/shm/kubectl \
   && mv /dev/shm/kubectl /usr/local/bin/kubectl
 
-COPY /bin /usr/local/bin
 COPY /opt /opt

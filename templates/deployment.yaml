@@ -21,7 +21,7 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       imagePullSecrets:
-      - name: {{ .Values.imagePullSecret }}
+      - name: {{ .Values.deploy.pullSecret }}
       containers:
         - name: {{ .Chart.Name }}
           args:
@@ -31,84 +31,46 @@ spec:
             - -template
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.deploy.image }}:{{ .Values.deploy.tag }}"
+          imagePullPolicy: {{ .Values.deploy.pullPolicy }}
           env:
           {{- range $pkey, $pval := .Values.env }}
           - name: {{ $pkey }}
             value: {{ quote $pval }}
           {{- end }}
           # SPECIFIC TO CI ENV FROM VALUES
-          - name: PROJECT
+          - name: K8SCI_PROJECT
             value: {{ required "project must be specified" .Values.project }}
-          - name: CI_CONTEXT_LIST
-            value: "{{ .Values.contextList }}"
-          - name: WEBHOOK_TOKEN
+          - name: K8SCI_WEBHOOK_TOKEN
             valueFrom:
               secretKeyRef:
                 name: {{ required "webhook.tokenSecretName must be specified" .Values.webhook.tokenSecretName }}
                 key: {{ .Values.webhook.tokenSecretKey }}
-          - name: K8S_NS
-            value: {{ .Values.k8sJobsNamespace }}
-          - name: K8S_SERVER
+          - name: K8SCI_K8S_NS
+            value: {{ default .Values.k8sJobsNamespace .Release.Namespace }}
+          - name: K8SCI_K8S_SERVER
             value: {{ required "kubectl.server must be specified" .Values.kubectl.server }}
-          - name: K8S_JOB_TOKEN_SECRET_NAME
+          - name: K8SCI_K8S_TOKEN_SECRET_NAME
             value: {{ required "kubectl.tokenSecretName must be specified" .Values.kubectl.tokenSecretName }}
-          - name: K8S_JOB_TOKEN_SECRET_KEY
+          - name: K8SCI_K8S_TOKEN_SECRET_KEY
             value: {{ .Values.kubectl.tokenSecretKey }}
-          - name: K8S_TOKEN
+          - name: K8SCI_K8S_TOKEN
             valueFrom:
               secretKeyRef:
                 name: {{ required "kubectl.tokenSecretName must be specified" .Values.kubectl.tokenSecretName }}
                 key: {{ .Values.kubectl.tokenSecretKey }}
-          - name: GIT_REPOSITORY
+          - name: K8SCI_GIT_REPOSITORY
             value: {{ required "git.repository must be specified" .Values.git.repository }}
-          - name: GIT_BRANCH_DEFAULT
-            value: {{ .Values.git.branchDefault }}
-          - name: GITCLONE_IMAGE
+          - name: K8SCI_GITCLONE_IMAGE
             value: {{ .Values.gitclone.image }}
-          - name: GITCLONE_TAG
+          - name: K8SCI_GITCLONE_TAG
             value: {{ .Values.gitclone.tag }}
-          - name: DOCKER_IMAGE
-            value: {{ .Values.docker.image }}
-          - name: DOCKER_TAG
-            value: {{ .Values.docker.tag }}
-          - name: BUILDKIT_IMAGE
-            value: {{ .Values.buildkit.image }}
-          - name: BUILDKIT_TAG
-            value: {{ .Values.buildkit.tag }}
-          - name: BUILD_CONTEXT
-            value: {{ .Values.build.context }}
-          - name: BUILD_DOCKERFILE
-            value: {{ .Values.build.dockerfile }}
-          - name: REGISTRY_URL
-            value: {{ .Values.registry.url }}
-          - name: REGISTRY_SECRET_NAME
-            value: {{ .Values.registry.secretName }}
-          - name: REGISTRY_USER_KEY
-            value: {{ .Values.registry.userKey }}
-          - name: REGISTRY_PASS_KEY
-            value: {{ .Values.registry.passKey }}
-          - name: REGISTRY_PUSH_PATH
-            value: {{ .Values.registry.pushPath }}
-          - name: REGISTRY_PUSH_TAG
-            value: {{ .Values.registry.pushTag }}
-          - name: REGISTRY_CACHE_TAG
-            value: {{ .Values.registry.cacheTag }}
-          - name: REGISTRY_CACHE_URL
-            value: {{ .Values.registry.cacheUrl }}
-          - name: REGISTRY_CACHE_PUSH_PATH
-            value: {{ .Values.registry.cachePushPath }}
-          - name: REGISTRY_CACHE_SECRET_NAME
-            value: {{ .Values.registry.cacheSecretName }}
-          - name: REGISTRY_CACHE_USER_KEY
-            value: {{ .Values.registry.cacheUserKey }}
-          - name: REGISTRY_CACHE_PASS_KEY
-            value: {{ .Values.registry.cachePassKey }}
-          - name: DEPLOY_JOB_IMAGE
-            value: {{ .Values.deployJob.image }}
-          - name: DEPLOY_JOB_IMAGE_TAG
-            value: {{ .Values.deployJob.imageTag }}
+          - name: K8SCI_PUSH_RUNNER_IMAGE
+            value: {{ .Values.pushRunner.image }}
+          - name: K8SCI_PUSH_RUNNER_TAG
+            value: {{ .Values.pushRunner.tag }}
+          - name: K8SCI_PUSH_RUNNER_COMMAND
+            value: {{ .Values.pushRunner.command }}
           ports:
             - name: http
               containerPort: 9000
@@ -123,21 +85,8 @@ spec:
               port: http
           volumeMounts:
             - name: configs
-              mountPath: "/opt/env.hook.sh"
-              subPath: "env.hook.sh"
-            - name: configs
               mountPath: "/etc/webhook/hooks.yaml"
               subPath: "hooks.yaml"
-            {{- range $name, $val := .Values.files }}
-            - name: configs
-              mountPath: {{ $name | replace "%" "." | quote }}
-              subPath: "file_{{ $name | replace "/" "_" | replace "%" "." }}"
-            {{- end }}
-            {{- range $name, $val := .Values.actions }}
-            - name: configs
-              mountPath: /opt/jobs/{{ $name }}/create.sh
-              subPath: "file__opt_jobs_{{ $name | replace "/" "_" | replace "%" "." }}_create.sh"
-            {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:

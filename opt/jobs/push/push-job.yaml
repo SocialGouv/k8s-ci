@@ -1,0 +1,64 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: push-job-{{.Env.JOB_ID}}
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 100
+  template:
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      restartPolicy: Never
+      initContainers:
+        - name: git-clone-repo
+          image: {{.Env.K8SCI_GITCLONE_IMAGE}}:{{.Env.K8SCI_GITCLONE_TAG}}
+          command:
+            - sh
+            - -c
+            - |
+              git clone \
+                --depth 1 \
+                {{.Env.K8SCI_GIT_REPOSITORY}} \
+                --branch {{.Env.K8SCI_BRANCH}} \
+                --single-branch \
+                /workspace
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+      containers:
+        - name: k8s-deploy
+          image: {{.Env.K8SCI_PUSH_RUNNER_IMAGE}}:{{.Env.K8SCI_PUSH_RUNNER_TAG}}
+          env:
+            - name: K8SCI_K8S_SERVER
+              value: {{.Env.K8SCI_K8S_SERVER}}
+            - name: K8SCI_K8S_NS
+              value: {{.Env.K8SCI_K8S_NS}}
+            - name: K8S_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{.Env.K8SCI_K8S_TOKEN_SECRET_NAME}}
+                  key: {{.Env.K8SCI_K8S_TOKEN_SECRET_KEY}}
+            - name: K8SCI_BRANCH
+              value: {{.Env.K8SCI_BRANCH}}
+          workingDir: /workspace
+          command:
+            - /bin/sh
+            - -c
+            - |
+              {{.Env.K8SCI_PUSH_RUNNER_COMMAND | strings.Indent 14 }}
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+          volumeMounts:
+            - name: workspace
+              readOnly: true
+              mountPath: /workspace
+      volumes:
+        - name: workspace
+          emptyDir: {}
