@@ -47,7 +47,6 @@ data:
                   source: payload
                   name: ref
             {{ end }}
-          - or: # request branch
             - match:
                 type: regex
                 regex: .*
