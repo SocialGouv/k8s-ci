@@ -16,8 +16,8 @@ ingress:
       - ci-emjpm.dev2.fabrique.social.gouv.fr
       secretName: wildcard-crt
 
-# branches:
-#   - next
-#   - prod
-#   - apitest
+branches:
+  - next
+  - prod
+  - apitest
 
