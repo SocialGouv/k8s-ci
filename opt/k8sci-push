@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 set -e
 
@@ -15,11 +15,4 @@ else
   job=$(echo $job | jq -rc --arg a "error" '.status = $a')
 fi
 
-case $K8SCI_OUTPUT in
-  id)
-    echo $JOB_ID
-    ;;
-  json | *)
-    echo '{}' | jq -rc ".job = $job"
-    ;;
-esac
+echo '{}' | jq -rc ".job = $job"

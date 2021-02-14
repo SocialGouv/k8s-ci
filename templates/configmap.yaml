@@ -68,9 +68,6 @@ data:
         - source: url
           name: branch
           envname: K8SCI_BRANCH
-        - source: url
-          name: output
-          envname: K8SCI_OUTPUT
 
     - id: status
       execute-command: /opt/k8sci-status
