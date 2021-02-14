@@ -47,7 +47,6 @@ data:
                   source: payload
                   name: ref
             {{ end }}
-          {{ end }}
           - or: # request branch
             - match:
                 type: regex
@@ -55,6 +54,7 @@ data:
                 parameter:
                   source: url
                   name: branch
+          {{ end }}
 
       command-working-directory: /opt
       response-headers:
