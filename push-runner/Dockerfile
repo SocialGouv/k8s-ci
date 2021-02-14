@@ -25,6 +25,7 @@ RUN set -ex \
     curl \
     sed \
     grep \
+    git \
   #
   && wget -O /dev/shm/kubectl \
     "https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl" \
