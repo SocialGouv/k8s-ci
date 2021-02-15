@@ -24,11 +24,16 @@ spec:
       - name: {{ .Values.deploy.pullSecret }}
       containers:
         - name: {{ .Chart.Name }}
-          args:
-            - -verbose
-            - -hooks=/etc/webhook/hooks.yaml
-            - -hotreload
-            - -template
+          command:
+            - /bin/sh
+            - -c
+            - |
+              /opt/k8sci-init-kubeconfig
+              /usr/local/bin/webhook \
+                -verbose \
+                -hooks=/etc/webhook/hooks.yaml \
+                -hotreload \
+                -template
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.deploy.image }}:{{ .Values.deploy.tag }}"

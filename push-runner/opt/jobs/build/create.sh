@@ -47,7 +47,4 @@ export K8SCI_REGISTRY_CACHE_USER_KEY=${K8SCI_REGISTRY_CACHE_USER_KEY:-"$K8SCI_RE
 export K8SCI_REGISTRY_CACHE_PASS_KEY=${K8SCI_REGISTRY_CACHE_PASS_KEY:-"$K8SCI_REGISTRY_PASS_KEY"}
 
 # run job
-cat $(dirname $0)/build-job.yaml | gomplate | kubectl \
-  --server=$K8SCI_K8S_SERVER --token=$K8SCI_K8S_TOKEN \
-  --namespace=$K8SCI_K8S_NS \
-  create -f -
+cat $(dirname $0)/build-job.yaml | gomplate | kubectl -n $K8SCI_K8S_NS create -f -
