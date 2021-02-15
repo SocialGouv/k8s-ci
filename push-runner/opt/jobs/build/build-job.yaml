@@ -31,6 +31,8 @@ spec:
                 --branch {{ .Env.K8SCI_BRANCH }} \
                 --single-branch \
                 /workspace
+
+              git tag --points-at HEAD>/workspace/.git/CURRENT_COMMIT_TAG
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000
@@ -89,13 +91,17 @@ spec:
             - /bin/sh
             - -c
             - |
-
+              OUTPUT_IMAGE="{{.Env.K8SCI_REGISTRY_URL}}/{{.Env.K8SCI_REGISTRY_PUSH_PATH}}:{{.Env.K8SCI_REGISTRY_PUSH_TAG}}"
+              CURRENT_COMMIT_TAG=$(cat .git/CURRENT_COMMIT_TAG)
+              if [ -n "$CURRENT_COMMIT_TAG" ]; then
+                OUTPUT_IMAGE="$OUTPUT_IMAGE,{{.Env.K8SCI_REGISTRY_URL}}/{{.Env.K8SCI_REGISTRY_PUSH_PATH}}:$CURRENT_COMMIT_TAG"
+              fi
               buildctl-daemonless.sh \
                 build \
                 --frontend dockerfile.v0 \
                 --local context=/workspace/{{ .Env.K8SCI_BUILD_CONTEXT }} \
                 --local dockerfile=/workspace/{{ .Env.K8SCI_BUILD_DOCKERFILE }} \
-                --output type=image,name={{.Env.K8SCI_REGISTRY_URL}}/{{.Env.K8SCI_REGISTRY_PUSH_PATH}}:{{.Env.K8SCI_REGISTRY_PUSH_TAG}},push=true \
+                --output type=image,\"name=$OUTPUT_IMAGE\",push=true \
                 --export-cache mode=max,type=registry,ref={{.Env.K8SCI_REGISTRY_CACHE_URL}}/{{.Env.K8SCI_REGISTRY_CACHE_PUSH_PATH}}:{{.Env.K8SCI_REGISTRY_CACHE_TAG}} \
                 --import-cache type=registry,ref={{.Env.K8SCI_REGISTRY_CACHE_URL}}/{{.Env.K8SCI_REGISTRY_CACHE_PUSH_PATH}}:{{.Env.K8SCI_REGISTRY_CACHE_TAG}} \
                 {{ env.Getenv "BUILD_ARGS" }}
