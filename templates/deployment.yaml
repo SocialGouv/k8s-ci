@@ -76,6 +76,8 @@ spec:
             value: {{ .Values.webhookRunner.commands.delete }}
           - name: K8SCI_CUSTOM_SECRET_NAME
             value: {{ .Values.jobs.customSecretName }}
+          - name: KUBECONFIG
+            value: /.kube/config
           ports:
             - name: http
               containerPort: 9000

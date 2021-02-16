@@ -1,0 +1,3 @@
+#!/bin/sh
+set -e
+/opt/k8sci-job delete $@
