@@ -36,6 +36,20 @@ to load it in your script, just do:
 MATTERMOST_WEBHOOK=$(cat /secrets/MATTERMOST_WEBHOOK)
 ```
 
+to aggregate logs you can use [kail](https://github.com/boz/kail), doing:
+```sh
+# everything k8sci on the project
+kail -n $K8SCI_NS -l app.kubernetes.io/managed-by=k8sci
+
+# only one pipeline
+kail -n $K8SCI_NS -l k8sci/gid=$K8SCI_GID
+
+# only one type
+kail -n $K8SCI_NS -l k8sci/type=hook,k8sci/hook=push
+kail -n $K8SCI_NS -l k8sci/type=job,k8sci/job=build
+kail -n $K8SCI_NS -l k8sci/type=job,k8sci/job=deploy
+```
+
 ### documentations:
 
 using:
