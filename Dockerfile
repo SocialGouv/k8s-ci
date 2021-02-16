@@ -1,11 +1,11 @@
 ARG GOMPLATE_VERSION=v3.6.0-slim
-ARG WEBHOOK_VERSION=2.8.0
 ARG ALPINE_VERSION=3.13
 
 FROM hairyhenderson/gomplate:$GOMPLATE_VERSION as gomplate
 
 # build webhook
 FROM golang:alpine$ALPINE_VERSION AS build
+ARG WEBHOOK_VERSION=2.8.0
 WORKDIR /go/src/github.com/adnanh/webhook
 RUN apk add --update -t build-deps curl libc-dev gcc libgcc
 RUN curl -L --silent -o webhook.tar.gz https://github.com/adnanh/webhook/archive/${WEBHOOK_VERSION}.tar.gz && \
