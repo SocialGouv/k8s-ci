@@ -18,6 +18,12 @@ spec:
       annotations:
         container.apparmor.security.beta.kubernetes.io/buildkit: unconfined
         container.seccomp.security.alpha.kubernetes.io/buildkit: unconfined
+      labels:
+        app.kubernetes.io/managed-by: k8sci
+        k8sci/gid: "{{.Env.K8SCI_GID}}"
+        k8sci/type: job
+        k8sci/job: build
+        k8sci/package: {{.Env.K8SCI_CONTEXT}}
     spec:
       securityContext:
         runAsUser: 1000

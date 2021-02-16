@@ -13,6 +13,13 @@ spec:
   activeDeadlineSeconds: 600
   ttlSecondsAfterFinished: 1800
   template:
+    metadata:
+      labels:
+        app.kubernetes.io/managed-by: k8sci
+        k8sci/gid: "{{.Env.K8SCI_GID}}"
+        k8sci/type: job
+        k8sci/job: deploy
+        k8sci/package: {{.Env.K8SCI_CONTEXT}}
     spec:
       securityContext:
         runAsUser: 1000
