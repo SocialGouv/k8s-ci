@@ -36,7 +36,7 @@ deploy:
   pullSecret: "registry-creds"
 
 webhookRunner:
-  image: registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci/push-runner
+  image: registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci/runner
   tag: latest
   commands:
     push: .k8sci/push
