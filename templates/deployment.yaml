@@ -30,7 +30,6 @@ spec:
             - |
               /opt/k8sci-init-kubeconfig
               /usr/local/bin/webhook \
-                -verbose \
                 -hooks=/etc/webhook/hooks.yaml \
                 -hotreload \
                 -template
