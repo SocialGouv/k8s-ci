@@ -38,7 +38,7 @@ spec:
             - name: workspace
               mountPath: /workspace
       containers:
-        - name: k8sci-run
+        - name: push-hook
           image: {{.Env.K8SCI_PUSH_RUNNER_IMAGE}}:{{.Env.K8SCI_PUSH_RUNNER_TAG}}
           env:
             - name: K8SCI_KUBECONFIG
