@@ -2,6 +2,11 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: pipeline-{{.Env.K8SCI_GID}}-hook-delete
+  labels:
+    app.kubernetes.io/managed-by: k8sci
+    k8sci/gid: "{{.Env.K8SCI_GID}}"
+    k8sci/type: hook
+    k8sci/hook: delete
 spec:
   backoffLimit: 0
   activeDeadlineSeconds: 3600

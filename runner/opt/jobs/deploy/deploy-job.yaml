@@ -2,6 +2,12 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: pipeline-{{.Env.K8SCI_GID}}-job-deploy-{{.Env.K8SCI_CONTEXT}}
+  labels:
+    app.kubernetes.io/managed-by: k8sci
+    k8sci/gid: "{{.Env.K8SCI_GID}}"
+    k8sci/type: job
+    k8sci/job: deploy
+    k8sci/package: {{.Env.K8SCI_CONTEXT}}
 spec:
   backoffLimit: 2
   activeDeadlineSeconds: 600
