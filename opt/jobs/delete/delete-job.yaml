@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: push-{{.Env.K8SCI_GID}}
+  name: delete-{{.Env.K8SCI_GID}}
 spec:
   backoffLimit: 0
   activeDeadlineSeconds: 3600
