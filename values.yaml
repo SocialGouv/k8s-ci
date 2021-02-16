@@ -38,7 +38,7 @@ deploy:
 pushRunner:
   image: registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci/push-runner
   tag: latest
-  command: .k8sci/run.sh
+  command: .k8sci/push
 
 
 nameOverride: ""
