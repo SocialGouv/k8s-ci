@@ -1,28 +1,21 @@
 #!/bin/sh
 
-K8SCI_WAIT_JOB_TYPE=${1:-"$K8SCI_WAIT_JOB_TYPE"}
-K8SCI_CONTEXT=${2:-"$K8SCI_CONTEXT"}
+JOB_NAME=${1}
 
-if [ -z "$K8SCI_WAIT_JOB_TYPE" ]; then
-  echo "missing 1 required argument or K8SCI_WAIT_JOB_TYPE env var"
-  exit 1
-fi
-if [ -z "$K8SCI_GID" ]; then
-  echo "missing K8SCI_GID env var"
+if [ -z "$JOB_NAME" ]; then
+  echo "missing 1 required argument: job name"
   exit 1
 fi
 
-JOB="job/runner-${K8SCI_GID}-${K8SCI_WAIT_JOB_TYPE}-${K8SCI_CONTEXT}"
+JOB="job/$JOB_NAME"
 
 retval_complete=1
 retval_failed=1
 while [[ $retval_complete -ne 0 ]] && [[ $retval_failed -ne 0 ]]; do
   sleep 2
-  output=$(kubectl --server=$K8SCI_K8S_SERVER --token=$K8SCI_K8S_TOKEN --namespace=$K8SCI_K8S_NS \
-    wait --for=condition=complete $JOB --timeout=0 2>&1)
+  output=$(kubectl -n $K8SCI_K8S_NS wait --for=condition=complete $JOB --timeout=0 2>&1)
   retval_complete=$?
-  output=$(kubectl --server=$K8SCI_K8S_SERVER --token=$K8SCI_K8S_TOKEN --namespace=$K8SCI_K8S_NS \
-    wait --for=condition=failed $JOB --timeout=0 2>&1)
+  output=$(kubectl -n $K8SCI_K8S_NS wait --for=condition=failed $JOB --timeout=0 2>&1)
   retval_failed=$?
 done
 
