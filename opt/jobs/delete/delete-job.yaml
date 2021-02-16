@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: delete-{{.Env.K8SCI_GID}}
+  name: pipeline-{{.Env.K8SCI_GID}}-hook-delete
 spec:
   backoffLimit: 0
   activeDeadlineSeconds: 3600

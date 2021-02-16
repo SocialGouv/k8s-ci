@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: runner-{{.Env.K8SCI_GID}}-deploy-{{.Env.K8SCI_CONTEXT}}
+  name: pipeline-{{.Env.K8SCI_GID}}-job-deploy-{{.Env.K8SCI_CONTEXT}}
 spec:
   backoffLimit: 2
   activeDeadlineSeconds: 600
