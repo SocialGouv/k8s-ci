@@ -9,10 +9,7 @@ data:
   kubectltoken: {{ required "kubectl.tokenSecretName must be specified" .Values.kubectl.tokenSecretName }}
   hooks.yaml: |
     - id: push
-      execute-command: /opt/k8sci-job
-      pass-arguments-to-command:
-        - type: value
-          value: push
+      execute-command: /opt/k8sci-push
       trigger-rule:
         and:
           - or: # token match
@@ -58,10 +55,7 @@ data:
                   name: branch
           {{ end }}
     - id: delete
-      execute-command: /opt/k8sci-job
-      pass-arguments-to-command:
-        - type: value
-          value: delete
+      execute-command: /opt/k8sci-delete
       trigger-rule:
         and:
           - or: # token match
