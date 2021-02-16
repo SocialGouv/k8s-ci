@@ -119,7 +119,10 @@ data:
       pass-environment-to-command:
         - source: payload
           name: ref
-          envname: K8SCI_BRANCH
+          envname: K8SCI_REF
+        - source: payload
+          name: ref_type
+          envname: K8SCI_REF_TYPE
         - source: url
           name: branch
           envname: K8SCI_BRANCH
