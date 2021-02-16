@@ -6,5 +6,5 @@ if [ -n "$TAG" ]; then
   docker build -t registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci/kail:$TAG kail
   docker push registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci/kail:$TAG
 fi
-docker build -t registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci/kail:latest kail
-docker push registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci/kail:latest
+docker build -t registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci/kail kail
+docker push registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci/kail
