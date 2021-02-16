@@ -36,6 +36,8 @@ spec:
         - name: k8s-deploy
           image: {{env.Getenv "K8SCI_DEPLOY_JOB_IMAGE" "registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci/push-runner"}}:{{env.Getenv "K8SCI_DEPLOY_JOB_TAG" "latest"}}
           env:
+            - name: K8SCI_KUBECONFIG
+              value: {{env.Getenv "K8SCI_KUBECONFIG" "/.kube/config"}}
             - name: K8SCI_K8S_SERVER
               value: {{.Env.K8SCI_K8S_DEPLOY_SERVER}}
             - name: K8SCI_K8S_TOKEN
