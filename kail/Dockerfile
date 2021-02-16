@@ -1,10 +1,11 @@
-ARG KUBECTL_VERSION=1.20.1
 ARG KAIL_VERSION=0.15.0
 ARG ALPINE_VERSION=3
 
 FROM abozanich/kail:v$KAIL_VERSION as kail
 
 FROM alpine:$ALPINE_VERSION
+
+ARG KUBECTL_VERSION=1.20.1
 
 COPY --from=kail /kail /usr/local/bin/kail
 
