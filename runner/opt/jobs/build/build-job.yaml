@@ -104,7 +104,7 @@ spec:
             - -c
             - |
               OUTPUT_IMAGE="{{.Env.K8SCI_REGISTRY_URL}}/{{.Env.K8SCI_REGISTRY_PUSH_PATH}}:{{.Env.K8SCI_REGISTRY_PUSH_TAG}}"
-              CURRENT_COMMIT_TAG=$(cat .git/CURRENT_COMMIT_TAG)
+              CURRENT_COMMIT_TAG=$(cat /workspace/.git/CURRENT_COMMIT_TAG)
               if [ -n "$CURRENT_COMMIT_TAG" ]; then
                 OUTPUT_IMAGE="$OUTPUT_IMAGE,{{.Env.K8SCI_REGISTRY_URL}}/{{.Env.K8SCI_REGISTRY_PUSH_PATH}}:$CURRENT_COMMIT_TAG"
               fi
