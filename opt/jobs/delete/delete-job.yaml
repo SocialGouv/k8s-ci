@@ -34,7 +34,7 @@ spec:
               git clone \
                 --depth 1 \
                 {{.Env.K8SCI_REPOSITORY}} \
-                --branch {{.Env.K8SCI_BRANCH}} \
+                --branch master \
                 --single-branch \
                 /workspace
           securityContext:
