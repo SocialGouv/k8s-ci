@@ -52,7 +52,7 @@ spec:
             - name: K8SCI_BRANCH
               value: {{.Env.K8SCI_BRANCH}}
             - name: K8SCI_GID
-              value: {{.Env.K8SCI_GID}}
+              value: "{{.Env.K8SCI_GID}}"
           workingDir: /workspace
           command:
             - /bin/sh
