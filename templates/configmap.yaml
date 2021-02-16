@@ -98,6 +98,19 @@ data:
                 parameter:
                   source: payload
                   name: secret
+          - or: # webhook branches
+            - match:
+                type: value
+                value: branch
+                parameter:
+                  source: payload
+                  name: ref_type
+            - match:
+                type: regex
+                regex: .*
+                parameter:
+                  source: url
+                  name: branch
       command-working-directory: /opt
       response-headers:
         - name: Content-Type
@@ -106,7 +119,7 @@ data:
       pass-environment-to-command:
         - source: payload
           name: ref
-          envname: K8SCI_REF
+          envname: K8SCI_BRANCH
         - source: url
           name: branch
           envname: K8SCI_BRANCH
