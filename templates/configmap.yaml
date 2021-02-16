@@ -9,7 +9,7 @@ data:
   kubectltoken: {{ required "kubectl.tokenSecretName must be specified" .Values.kubectl.tokenSecretName }}
   hooks.yaml: |
     - id: push
-      execute-command: /opt/k8sci-push
+      execute-command: /opt/k8sci-job push
       trigger-rule:
         and:
           - or: # token match
@@ -54,6 +54,35 @@ data:
                   source: url
                   name: branch
           {{ end }}
+    - id: delete
+      execute-command: /opt/k8sci-job delete
+      trigger-rule:
+        and:
+          - or: # token match
+            - match: # url ?token=
+                type: value
+                value: '{{"{{"}} getenv "K8SCI_WEBHOOK_TOKEN" | js {{"}}"}}'
+                parameter:
+                  source: url
+                  name: token
+            - match: # github webhook
+                type: payload-hmac-sha1
+                secret: '{{"{{"}} getenv "K8SCI_WEBHOOK_TOKEN" | js {{"}}"}}'
+                parameter:
+                  source: header
+                  name: X-Hub-Signature
+            - match: # gitlab webhook
+                type: value
+                value: '{{"{{"}} getenv "K8SCI_WEBHOOK_TOKEN" | js {{"}}"}}'
+                parameter:
+                  source: header
+                  name: X-Gitlab-Token
+            - match: # gitea webhook
+                type: value
+                value: '{{"{{"}} getenv "K8SCI_WEBHOOK_TOKEN" | js {{"}}"}}'
+                parameter:
+                  source: payload
+                  name: secret
 
       command-working-directory: /opt
       response-headers:

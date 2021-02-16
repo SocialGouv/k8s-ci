@@ -35,10 +35,12 @@ deploy:
   pullPolicy: Always
   pullSecret: "registry-creds"
 
-pushRunner:
+webhookRunner:
   image: registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci/push-runner
   tag: latest
-  command: .k8sci/push
+  commands:
+    push: .k8sci/push
+    delete: .k8sci/delete
 
 
 nameOverride: ""

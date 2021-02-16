@@ -2,11 +2,13 @@
 
 set -e
 
+JOB_NAME=$1
+
 export JOB_ID=$(uuidgen)
 
 job="{}"
 job=$(echo $job | jq -rc --arg a "$JOB_ID" '.id = $a')
-if result=$(/opt/jobs/push/create.sh 2>&1); then
+if result=$(/opt/jobs/${JOB_NAME}/create.sh 2>&1); then
   job=$(echo $job | jq -rc --arg a "$result" '.message = $a')
   job=$(echo $job | jq -rc --arg a "success" '.status = $a')
   jobs=$(echo $jobs | jq -r ". |= .+ [$job]")

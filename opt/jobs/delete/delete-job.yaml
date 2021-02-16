@@ -1,0 +1,78 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: push-{{.Env.JOB_ID}}
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 3600
+  ttlSecondsAfterFinished: 1800
+  template:
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      restartPolicy: Never
+      initContainers:
+        - name: git-clone-repo
+          image: alpine/git:v2.30.0
+          command:
+            - sh
+            - -c
+            - |
+              git clone \
+                --depth 1 \
+                {{.Env.K8SCI_REPOSITORY}} \
+                --branch {{.Env.K8SCI_BRANCH}} \
+                --single-branch \
+                /workspace
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+      containers:
+        - name: k8sci-run
+          image: {{.Env.K8SCI_PUSH_RUNNER_IMAGE}}:{{.Env.K8SCI_PUSH_RUNNER_TAG}}
+          env:
+            - name: K8SCI_KUBECONFIG
+              value: {{env.Getenv "K8SCI_KUBECONFIG" "/.kube/config"}}
+            - name: K8SCI_K8S_SERVER
+              value: {{.Env.K8SCI_K8S_SERVER}}
+            - name: K8SCI_K8S_NS
+              value: {{.Env.K8SCI_K8S_NS}}
+            - name: K8SCI_K8S_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{.Env.K8SCI_K8S_TOKEN_SECRET_NAME}}
+                  key: {{.Env.K8SCI_K8S_TOKEN_SECRET_KEY}}
+            - name: K8SCI_REPOSITORY
+              value: {{.Env.K8SCI_REPOSITORY}}
+            - name: K8SCI_BRANCH
+              value: {{.Env.K8SCI_BRANCH}}
+          workingDir: /workspace
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              /opt/k8sci-init-kubeconfig
+              {{.Env.K8SCI_DELETE_RUNNER_COMMAND | strings.Indent 14 }}
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+          volumeMounts:
+            - name: workspace
+              readOnly: true
+              mountPath: /workspace
+            - name: custom-jobs-secrets
+              readOnly: true
+              mountPath: /secrets
+
+      volumes:
+        - name: workspace
+          emptyDir: {}
+        - name: custom-jobs-secrets
+          secret:
+            secretName: {{.Env.K8SCI_CUSTOM_SECRET_NAME}}

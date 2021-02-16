@@ -67,11 +67,13 @@ spec:
           - name: K8SCI_REPOSITORY
             value: {{ required "repository must be specified" .Values.repository }}
           - name: K8SCI_PUSH_RUNNER_IMAGE
-            value: {{ .Values.pushRunner.image }}
+            value: {{ .Values.webhookRunner.image }}
           - name: K8SCI_PUSH_RUNNER_TAG
-            value: {{ .Values.pushRunner.tag }}
+            value: {{ .Values.webhookRunner.tag }}
           - name: K8SCI_PUSH_RUNNER_COMMAND
-            value: {{ .Values.pushRunner.command }}
+            value: {{ .Values.webhookRunner.commands.push }}
+          - name: K8SCI_DELETE_RUNNER_COMMAND
+            value: {{ .Values.webhookRunner.commands.delete }}
           - name: K8SCI_CUSTOM_SECRET_NAME
             value: {{ .Values.jobs.customSecretName }}
           ports:
