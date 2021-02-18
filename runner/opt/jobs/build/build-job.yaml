@@ -80,7 +80,7 @@ spec:
             - sh
             - -c
             - |
-              if [ "{{.Env.K8SCI_REGISTRY_CACHE_URL}}" = "{{.Env.K8SCI_REGISTRY_CACHE_PUSH_PATH}}" ]; then
+              if [ "{{.Env.K8SCI_REGISTRY_CACHE_URL}}" = "{{.Env.K8SCI_REGISTRY_URL}}" ]; then
                 echo '{"auths":{"{{.Env.K8SCI_REGISTRY_URL}}":{"username":"'$REGISTRY_USER'","password":"'$REGISTRY_PASS'"}}}' > /home/user/.docker/config.json
               else
                 echo '{"auths":{"{{.Env.K8SCI_REGISTRY_URL}}":{"username":"'$REGISTRY_USER'","password":"'$REGISTRY_PASS'"},"{{.Env.K8SCI_REGISTRY_CACHE_URL}}":{"username":"'$REGISTRY_CACHE_USER'","password":"'$REGISTRY_CACHE_PASS'"}}}' > /home/user/.docker/config.json
