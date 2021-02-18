@@ -25,3 +25,7 @@ helm -n $REGISTRY_NS upgrade --install docker-registry stable/docker-registry \
   --set ingress.tls[0].hosts[0]=${REGISTRY_HOST} \
   --set ingress.tls[0].secretName=wildcard-crt \
   --set secrets.htpasswd=$HTPASSWD
+
+
+# https://stackoverflow.com/a/61078171/5338073
+kubectl -n $REGISTRY_NS annotate --overwrite ingress docker-registry 'nginx.ingress.kubernetes.io/proxy-body-size="0"'
