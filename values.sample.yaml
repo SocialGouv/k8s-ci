@@ -20,4 +20,6 @@ branches:
   - next
   - prod
   - apitest
+  - demo
+  - receipt
 
