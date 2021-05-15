@@ -25,9 +25,9 @@ helm -n $REGISTRY_NS upgrade --install docker-registry stable/docker-registry \
   --set ingress.tls[0].hosts[0]=${REGISTRY_HOST} \
   --set ingress.tls[0].secretName=wildcard-crt \
   --set resources.requests.cpu=100m \
-  --set resources.requests.memory=1000m \
+  --set resources.requests.memory=1000Mi \
   --set resources.limits.cpu=500m \
-  --set resources.limits.memory=2000m \
+  --set resources.limits.memory=2000Mi \
   --set secrets.htpasswd=$HTPASSWD
 
 
