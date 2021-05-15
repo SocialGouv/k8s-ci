@@ -43,3 +43,5 @@ RUN set -ex \
   && mv /dev/shm/kubectl /usr/local/bin/kubectl
 
 COPY /opt /opt
+
+USER 1000
