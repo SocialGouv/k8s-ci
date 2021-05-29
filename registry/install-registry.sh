@@ -1,7 +1,8 @@
 #!/bin/sh
 
 REGISTRY_NS="registry"
-K8S_JOBS_NS="k8s-jobs"
+REGISTRY_HOST="registry-xxxxx.dev2.fabrique.social.gouv.fr"
+K8S_JOBS_NS="ci-xxxxx"
 CREDS_SECRET_NAME="registry-creds"
 
 REGISTRY_USER=$(kubectl -n $K8S_JOBS_NS get secret $CREDS_SECRET_NAME -ojsonpath='{.data.user}' 2>/dev/null | base64 --decode)
@@ -32,4 +33,8 @@ helm -n $REGISTRY_NS upgrade --install docker-registry stable/docker-registry \
 
 
 # https://stackoverflow.com/a/61078171/5338073
+# kubectl -n $REGISTRY_NS annotate --overwrite ingress docker-registry 'kubernetes.io/ingress.class:="nginx"'
+kubectl -n $REGISTRY_NS annotate --overwrite ingress docker-registry 'nginx.org/client-max-body-size="0"'
 kubectl -n $REGISTRY_NS annotate --overwrite ingress docker-registry 'nginx.ingress.kubernetes.io/proxy-body-size="0"'
+kubectl -n $REGISTRY_NS annotate --overwrite ingress docker-registry 'nginx.ingress.kubernetes.io/proxy-read-timeout="600"'
+kubectl -n $REGISTRY_NS annotate --overwrite ingress docker-registry 'nginx.ingress.kubernetes.io/proxy-send-timeout="600"'

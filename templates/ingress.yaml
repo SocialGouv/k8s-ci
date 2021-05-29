@@ -31,10 +31,10 @@ spec:
         paths:
         {{- range .paths }}
         - path: {{ . }}
-            pathType: Prefix
-            backend:
-              serviceName: {{ $fullName }}
-              servicePort: {{ $svcPort }}
+          pathType: Prefix
+          backend:
+            serviceName: {{ $fullName }}
+            servicePort: {{ $svcPort }}
           # - path: {{ . }}
           #   pathType: Prefix
           #   backend:
