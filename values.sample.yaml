@@ -1,10 +1,10 @@
 project: emjpm
 rancher:
-  clusterId: c-bd7z2
-  projectId: p-57mxc
+  clusterId: c-gjtkk
+  projectId: p-74q7c
 repository: https://github.com/SocialGouv/emjpm
 kubectl:
-  server: https://rancher.fabrique.social.gouv.fr/k8s/clusters/c-bd7z2
+  server: https://rancher.fabrique.social.gouv.fr/k8s/clusters/c-gjtkk
 ingress:
   enabled: true
   hosts:

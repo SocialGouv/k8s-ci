@@ -1,7 +1,7 @@
 #!/bin/sh
 
 REGISTRY_NS="registry"
-REGISTRY_HOST="registry-xxxxx.dev2.fabrique.social.gouv.fr"
+REGISTRY_HOST="registry-xxxxx.my-cool-project-domain.tld"
 K8S_JOBS_NS="ci-xxxxx"
 CREDS_SECRET_NAME="registry-creds"
 
