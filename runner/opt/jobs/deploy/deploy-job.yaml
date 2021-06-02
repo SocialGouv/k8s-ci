@@ -47,7 +47,7 @@ spec:
               mountPath: /workspace
       containers:
         - name: k8s-deploy
-          image: {{env.Getenv "K8SCI_DEPLOY_JOB_IMAGE" "registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci/runner"}}:{{env.Getenv "K8SCI_DEPLOY_JOB_TAG" "latest"}}
+          image: {{env.Getenv "K8SCI_DEPLOY_JOB_IMAGE" "harbor.fabrique.social.gouv.fr/emjpm/k8s-ci/runner"}}:{{env.Getenv "K8SCI_DEPLOY_JOB_TAG" "latest"}}
           env:
             - name: K8SCI_KUBECONFIG
               value: {{env.Getenv "K8SCI_KUBECONFIG" "/.kube/config"}}

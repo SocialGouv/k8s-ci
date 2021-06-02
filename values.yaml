@@ -30,13 +30,13 @@ env: {}
 replicaCount: 1
 
 deploy:
-  image: registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci
+  image: harbor.fabrique.social.gouv.fr/emjpm/k8s-ci
   tag: latest
   pullPolicy: Always
   pullSecret: "registry-creds"
 
 webhookRunner:
-  image: registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci/runner
+  image: harbor.fabrique.social.gouv.fr/emjpm/k8s-ci/runner
   tag: latest
   commands:
     push: .k8sci/push

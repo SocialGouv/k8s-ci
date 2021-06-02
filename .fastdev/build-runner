@@ -3,8 +3,8 @@ set -e
 
 TAG=$1
 if [ -n "$TAG" ]; then
-  docker build -t registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci/runner:$TAG runner
-  docker push registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci/runner:$TAG
+  docker build -t harbor.fabrique.social.gouv.fr/emjpm/k8s-ci/runner:$TAG runner
+  docker push harbor.fabrique.social.gouv.fr/emjpm/k8s-ci/runner:$TAG
 fi
-docker build -t registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci/runner runner
-docker push registry.gitlab.factory.social.gouv.fr/socialgouv/sre/k8s-ci/runner
+docker build -t harbor.fabrique.social.gouv.fr/emjpm/k8s-ci/runner runner
+docker push harbor.fabrique.social.gouv.fr/emjpm/k8s-ci/runner
