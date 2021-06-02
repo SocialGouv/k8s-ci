@@ -44,4 +44,6 @@ RUN set -ex \
 
 COPY /opt /opt
 
+RUN mkdir /.kube && chown 1000:1000 /.kube
+
 USER 1000
