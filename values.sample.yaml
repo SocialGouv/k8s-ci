@@ -8,12 +8,12 @@ kubectl:
 ingress:
   enabled: true
   hosts:
-    - host: ci-emjpm.dev2.fabrique.social.gouv.fr
+    - host: ci-emjpm.dev.fabrique.social.gouv.fr
       paths:
         - /
   tls:
     - hosts:
-      - ci-emjpm.dev2.fabrique.social.gouv.fr
+      - ci-emjpm.dev.fabrique.social.gouv.fr
       secretName: wildcard-crt
 
 branches:
