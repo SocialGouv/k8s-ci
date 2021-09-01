@@ -13,10 +13,11 @@ retval_complete=1
 retval_failed=1
 while [[ $retval_complete -ne 0 ]] && [[ $retval_failed -ne 0 ]]; do
   sleep 2
-  output=$(kubectl -n $K8SCI_K8S_NS wait --for=condition=complete $JOB --timeout=0 2>&1)
+  output=$(timeout 2s kubectl -n $K8SCI_K8S_NS wait --for=condition=complete $JOB --timeout=0 2>&1)
   retval_complete=$?
-  output=$(kubectl -n $K8SCI_K8S_NS wait --for=condition=failed $JOB --timeout=0 2>&1)
+  output=$(timeout 2s kubectl -n $K8SCI_K8S_NS wait --for=condition=failed $JOB --timeout=0 2>&1)
   retval_failed=$?
+  wait
 done
 
 if [ $retval_failed -eq 0 ]; then
