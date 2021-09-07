@@ -41,8 +41,8 @@ data:
           - or: # webhook branches
             {{ range $i, $branch := .Values.branches }}
             - match:
-                type: value
-                value: refs/heads/{{ $branch }}
+                type: regex
+                regex: refs/heads/{{ $branch }}
                 parameter:
                   source: payload
                   name: ref

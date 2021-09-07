@@ -17,9 +17,6 @@ ingress:
       secretName: wildcard-crt
 
 branches:
-  - next
   - prod
-  - apitest
-  - demo
-  - receipt
+  - ".*\\.dev"
 
