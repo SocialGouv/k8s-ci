@@ -1,4 +1,4 @@
-ARG GOMPLATE_VERSION=v3.6.0-slim
+ARG GOMPLATE_VERSION=v3.11.7-slim
 ARG ALPINE_VERSION=3.13
 
 FROM hairyhenderson/gomplate:$GOMPLATE_VERSION as gomplate
